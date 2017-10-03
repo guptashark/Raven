@@ -26,4 +26,23 @@ struct class_instantiation {
 
 };	
 
-
+/* Required functions: 
+ *
+ * create_class(class_name)	
+ * 	registers the class in a global set of class defs. 
+ * 
+ * add_member_var(class_name, attributes, type, etc)	
+ * 	Adds the specified variabel to an existing class. 
+ *
+ * TODO: Since these are methods... something special has to happen here
+ * add_member_fn(class_name, fn_name, fn_attributes, etc)
+ * 	Adds the specified function to an existing class. ((HOWW??))
+ *
+ * finalizes_class(class_name)
+ * 	Indicates that the class definition is finished, and should now not be modified. 
+ *
+ * instantiate(fresh_ptr, class_name)
+ * 	// don't see a real way to create member functions with all the stuff we want. 	
+ *	// unless we decide to implement them as constructs in the new language
+ * 	
+ */
