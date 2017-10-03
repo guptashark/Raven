@@ -137,16 +137,36 @@
 
 struct scanner {
 
-	char buff_A[SCANNER_BUFFSIZE + 1];
-	char buff_B[SCANNER_BUFFSIZE + 1];
+	char buff_A[SCANNER_BUFFSIZE];
+	char buff_B[SCANNER_BUFFSIZE];
 
+	int lex_end_index;
+	int current_buffer_limit;
 	char *lex_begin;
 	char *lex_end;
 
 	FILE *source;
 
 	bool using_buff_A;
+	bool on_final_read;
+	bool scanning_terminated;
 };
+
+
+/* reload the scanner */
+/* We make it impossible for a scanner to load an eof at the 
+ * same spot as the sentinels. Since we're only loading 
+ * SCANNER_BUFFSIZE bytes, there's just no way to fill that 
+ * last spot with an eof 
+ *
+ * ALSO
+ * We can check how many spots we've loaded. If it is any less 
+ * than buffsize, then we know that we've reached the end of input. 
+ * In which case, the next call to scanner_reload should do nothing, 
+ * and a call to scanner_getc should return EOF. Alternatively, we can 
+ * cause a system crash if someone asks for more characters after getting EOF. 
+ */
+
 
 /* Leave the scanner on stack. It's size is constant. */  
 /* may add other params as necessary. */
@@ -159,14 +179,14 @@ scanner_ctor
 
 	/* Zeroed buffers are nice, but they'll be overwritten anyways. */
 	/* more importantly, set our sentinels to eof. */
-	sp->buff_A[SCANNER_BUFFSIZE] = EOF;
-	sp->buff_B[SCANNER_BUFFSIZE] = EOF;
+	sp->buff_A[SCANNER_BUFFSIZE];
+	sp->buff_B[SCANNER_BUFFSIZE];
 
 	/* Is this the right way to set a pointer here... */
 	/* TODO is this right... */
+	sp->lex_end_index = 0;
 	sp->lex_begin = sp->buff_A;
 	sp->lex_end = sp->buff_A;
-
 
 	/* open up the file, with the checks. */
 	FILE *source = fopen(filename, "r");
@@ -189,18 +209,151 @@ scanner_ctor
 		return 1;
 	}
 
-	/* Load the data into buff_A */
-	size_t num_chars_read = fread(	sp->buff_A, 
+	size_t chars_read = fread(
+			sp->buff_A, 
+			sizeof(char), 
+			SCANNER_BUFFSIZE, 
+			sp->source);
+
+	if(chars_read < SCANNER_BUFFSIZE && chars_read > 0) {
+		sp->on_final_read = true;
+		sp->scanning_terminated = false;
+	} else if(chars_read == 0) {
+		sp->on_final_read = true;
+		sp->scanning_terminated = true;
+	} else {
+		sp->on_final_read = false;
+		sp->scanning_terminated = false;
+	}
+
+	sp->current_buffer_limit = chars_read;
+	/* proper settings for reload fn */
+	sp->using_buff_A = true;
+
+	return 0;
+}
+
+int 
+scanner_reload
+(struct scanner *sp) {
+
+	/* Select the new buffer */
+	char *fresh_buff;
+	if(sp->using_buff_A) {
+		fresh_buff = sp->buff_B;
+	} else { 
+		fresh_buff = sp->buff_A;
+	}
+
+	sp->using_buff_A = !(sp->using_buff_A);
+
+	size_t chars_read = fread(	fresh_buff,
 					sizeof(char), 
 					SCANNER_BUFFSIZE, 
 					sp->source);
 
-	sp->using_buff_A = true;
+	/* TODO */
+	/* We should probably check that we even loaded something in... */
+	
+	/* set the lex_end pointer to the start of the new buffer. */
+	/* Update the lex_end_index to 0.*/ 
 
-	/* and we're done! (TODO fix return values */
+	if(chars_read < SCANNER_BUFFSIZE) { 
+		sp->current_buffer_limit = chars_read;
+	}
+
+	if(chars_read == 0) {
+		sp->scanning_terminated = true;
+		// sort of a tricky situation - need to set another flag! 
+		// can potentially swap functions so that on call, it rets
+		// nothing but eof. 
+	}
+
+	sp->lex_end = fresh_buff;
+	sp->lex_end_index = 0;
+
 	return 0;
 }
 
+int
+scanner_getc
+(struct scanner *sp,
+ int *c) {
+
+
+/* Since we can't really check against eof... 
+ * since our buffer is only characters... 
+ * we'll have to do the check if we're at the buff end. 
+ * The reloader sets the upper bound, and we count. 
+ * Once we reach the upper bound, auto reload. If the 
+ * bound indicates were' at the end of the file, then 
+ * send out eofs. 
+ */
+
+	/* potentially do the type conversion to make it work 
+	 * with a int *c instead of char *c so that we can send a 
+	 * compliant EOF 
+	 */
+
+/* Small little if, just check if scanning is terminated. 
+ * If it is, return after sending out an EOF. 
+ * Otherwise, continue on. 
+ */
+	/* execution stops if we get here. */
+	if(sp->scanning_terminated) {
+		*c = EOF;
+		return 0;
+	}
+		
+	char val = *(sp->lex_end);
+	int c_val = val;
+	*c = c_val;
+
+	sp->lex_end++;
+	sp->lex_end_index++;
+
+	if(sp->lex_end_index == sp->current_buffer_limit) { 
+		if(sp->on_final_read) {
+			// do something for final/close procedurse. 
+			// probably just send eof. 
+			sp->scanning_terminated = true;
+		} else {
+			// buffer reload. 
+			scanner_reload(sp);
+			scanner_getc(sp, c);
+		}
+	} 
+
+
+	return 0;
+/*
+	if(*(sp->lex_end) == EOF) {
+		if(sp->lex_end_index == SCANNER_BUFFSIZE) {
+			printf("SAYS END OF BUFFER\n");
+			// is this proper? TODO 
+			scanner_reload(sp);
+			scanner_getc(sp, c);
+		} else {
+			// we're at the end of the input. 
+			// TODO set scanner flags 
+			printf("WE're AT THE END OF THE INPPUTT! \n");
+			printf("We're at the end of input! \n");
+			*c = EOF;
+		}
+
+		return 0;
+
+	} else {
+		*c = *(sp->lex_end);
+		sp->lex_end++;
+		sp->lex_end_index++;
+		printf("JUST READ: %02x = %c\n", *c, *c);
+		printf("CURRENT INDEX VALUE: %d\n", sp->lex_end_index);
+		return 0;
+	}
+
+*/
+}
 
 int main(void) {
 
@@ -208,9 +361,22 @@ int main(void) {
 	
 	struct scanner s;
 	int ret_val = scanner_ctor(&s, "lexa_test_01.txt");
-	if(ret_val) {
-		printf("OH NOOO!??\n");
+
+	int full_buff[256];
+	for(int i = 0; i < 256; i++) full_buff[i] = '\0';
+
+	int c = 'a';
+	int i = 0;
+	while(c != EOF && i < 100) {
+		scanner_getc(&s, &c);
+		full_buff[i] = c;
+		i = i + 1;
 	}
+
+	for(int i = 0; i < 256; i++) {	
+		printf("%c", full_buff[i]);
+	}
+
 
 	return 0;
 	
