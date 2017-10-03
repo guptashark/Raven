@@ -320,7 +320,6 @@ scanner_getc
 		} else {
 			// buffer reload. 
 			scanner_reload(sp);
-			scanner_getc(sp, c);
 		}
 	} 
 
@@ -362,23 +361,14 @@ int main(void) {
 	struct scanner s;
 	int ret_val = scanner_ctor(&s, "lexa_test_01.txt");
 
-	int full_buff[256];
-	for(int i = 0; i < 256; i++) full_buff[i] = '\0';
+	// the "char" we're reading into. 
+	
+	int c = 1;
 
-	int c = 'a';
-	int i = 0;
-	while(c != EOF && i < 100) {
+	while(c != EOF) {
 		scanner_getc(&s, &c);
-		full_buff[i] = c;
-		i = i + 1;
+		printf("%c", c);
 	}
-
-	for(int i = 0; i < 256; i++) {	
-		printf("%c", full_buff[i]);
-	}
-
 
 	return 0;
-	
-
 }

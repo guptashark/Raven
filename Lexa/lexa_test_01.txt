@@ -1,1 +1,16 @@
-abcdefghijklmnopqrstuvwxyz
+This is some proper text. Not like that other garbage. Also, this should
+handle... tabs! 
+
+		Newlines! 
+
+
+
+
+And spaces! 
+          10 btw. 
+
+If everything looks good, and this program is basically just cat, I think we
+are good to go. 
+
+And vim puts thing son differetn lines, but this program doesn't need to. 
+It just echoes out what was in the file. So, That is that. Tada.
