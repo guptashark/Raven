@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <assert.h>
+#include <stdbool.h>
 
+#include "lexa.h"
 /* Requirements for this lexical analysis tool. 
  *
  * 1) User specification of tokens is important. (ie, regex config file).
@@ -132,21 +135,84 @@
  *
  */
 
+struct scanner {
+
+	char buff_A[SCANNER_BUFFSIZE + 1];
+	char buff_B[SCANNER_BUFFSIZE + 1];
+
+	char *lex_begin;
+	char *lex_end;
+
+	FILE *source;
+
+	bool using_buff_A;
+};
+
+/* Leave the scanner on stack. It's size is constant. */  
+/* may add other params as necessary. */
+int 
+scanner_ctor
+(struct scanner *sp, 
+ char *filename) {
+
+	assert(sp != NULL);
+
+	/* Zeroed buffers are nice, but they'll be overwritten anyways. */
+	/* more importantly, set our sentinels to eof. */
+	sp->buff_A[SCANNER_BUFFSIZE] = EOF;
+	sp->buff_B[SCANNER_BUFFSIZE] = EOF;
+
+	/* Is this the right way to set a pointer here... */
+	/* TODO is this right... */
+	sp->lex_begin = sp->buff_A;
+	sp->lex_end = sp->buff_A;
 
 
+	/* open up the file, with the checks. */
+	FILE *source = fopen(filename, "r");
+	sp->source = source;
+
+	/* TODO address the following */
+	/* Check that source isn't null. */
+	/* Also check something with errno? */
+	if(NULL == sp->source) {
+		/* TODO address the floowing. */
+		/* Need to send some kind of signal, 
+		 * or set the scanner in a bad state. 
+		 * But like, if sp->source is Null, it's 
+		 * already unusable anyways. 
+		 *
+		 * For now, print the file does not exist.
+		 */
+
+		printf("The file doesn't exist!\n");
+		return 1;
+	}
+
+	/* Load the data into buff_A */
+	size_t num_chars_read = fread(	sp->buff_A, 
+					sizeof(char), 
+					SCANNER_BUFFSIZE, 
+					sp->source);
+
+	sp->using_buff_A = true;
+
+	/* and we're done! (TODO fix return values */
+	return 0;
+}
 
 
 int main(void) {
 
 	printf("Lexical analysis software for the Raven compiler.\n");
-
-	int ch;
-
-	while((ch=getchar()) != EOF) {
-		printf(">>> ");
-		
+	
+	struct scanner s;
+	int ret_val = scanner_ctor(&s, "lexa_test_01.txt");
+	if(ret_val) {
+		printf("OH NOOO!??\n");
 	}
 
-	printf("\nDone\n");
 	return 0;
+	
+
 }

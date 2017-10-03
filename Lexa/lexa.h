@@ -1,0 +1,1 @@
+#define SCANNER_BUFFSIZE 4096
