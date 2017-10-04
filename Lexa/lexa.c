@@ -30,6 +30,9 @@ struct scanner {
 	bool using_buff_A;
 	bool on_final_read;
 
+	bool next_buff_already_loaded;
+	bool was_on_final_read;
+
 	/* A function pointer seems perfect */
 	int (*scanner_getc)(struct scanner *, int *);
 };
@@ -100,9 +103,46 @@ scanner_ctor
 	sp->current_buffer_limit = chars_read;
 	/* proper settings for reload fn */
 	sp->using_buff_A = true;
-	
+	sp->next_buff_already_loaded = false;
+	sp->was_on_final_read = false;
 
 	return 0;
+}
+
+int scanner_ungetc(struct scanner *sp) {
+
+	/* if lex_begin == lex_end then nothing to do. */
+	if(sp->lex_begin == sp->lex_end) {
+		// TODO Return something other than 0... 
+		// and set an errno or something. 
+		return 0;
+	}
+
+	if(sp->lex_end_index > 0) {
+		sp->lex_end_index--;
+		sp->lex_end--;
+		return 0;
+	}
+
+	if(sp->lex_end_index == 0) {
+		sp->lex_end_index = SCANNER_BUFFSIZE - 1;
+		// which buffer are we on? 
+		if(sp->using_buff_A) {
+			sp->lex_end = &(sp->buff_B[SCANNER_BUFFSIZE - 1]);
+		else {
+			sp->lex_end = &(sp->buff_A[SCANNER_BUFFSIZE - 1]);
+		}
+
+		sp->using_buff_A = !(sp->using_buff_A);
+		sp->next_buff_already_loaded = true;
+
+		if(sp->on_final_read) {
+			sp->was_on_final_read = true;
+			sp->on_final_read = false;
+		}
+
+		return 0;
+	}
 }
 
 int scanner_reload(struct scanner *sp) {
@@ -117,26 +157,29 @@ int scanner_reload(struct scanner *sp) {
 
 	sp->using_buff_A = !(sp->using_buff_A);
 
-	size_t chars_read = fread(	fresh_buff,
+	if(!(sp->next_buffer_already_loaded)) {
+	
+		size_t chars_read = fread(	
+					fresh_buff,
 					sizeof(char), 
 					SCANNER_BUFFSIZE, 
 					sp->source);
 
-	/* TODO */
-	/* We should probably check that we even loaded something in... */
+		/* TODO */
+		/* We should probably check that we even loaded something in... */
 	
-	/* set the lex_end pointer to the start of the new buffer. */
-	/* Update the lex_end_index to 0.*/ 
+		/* set the lex_end pointer to the start of the new buffer. */
+		/* Update the lex_end_index to 0.*/ 
 
-	//printf("The num_chars read are: %d\n", chars_read);
-	if(chars_read < SCANNER_BUFFSIZE) { 
-		sp->current_buffer_limit = chars_read;
-		sp->on_final_read = true;
-	}
+		if(chars_read < SCANNER_BUFFSIZE) { 
+			sp->current_buffer_limit = chars_read;
+			sp->on_final_read = true;
+		}
 
-	if(chars_read == 0) {
-		sp->scanner_getc = scanner_getc_EOF;
-		fclose(sp->source);
+		if(chars_read == 0) {
+			sp->scanner_getc = scanner_getc_EOF;
+			fclose(sp->source);
+		}
 	}
 
 	sp->lex_end = fresh_buff;
@@ -169,6 +212,14 @@ int scanner_getc(struct scanner *sp, int *c) {
 	} 
 
 	return 0;
+}
+
+int scanner_pretty_print(struct scanner *sp) {
+
+	// Print buffers
+	// Print location of pointers. 
+	// print flags. 
+	
 }
 
 int main(void) {
