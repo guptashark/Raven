@@ -4,6 +4,17 @@
 
 #include "lexa.h"
 
+/*
+ * TODO
+ *
+ * Proper feof and ferror checking in case fread
+ * reads less than (var count) bytes. 
+ *
+ * Close the file on input termination. 
+ *
+ * implement ungetc. 
+ */
+
 struct scanner {
 
 	char buff_A[SCANNER_BUFFSIZE];
@@ -81,6 +92,7 @@ scanner_ctor
 	} else if(chars_read == 0) {
 		sp->on_final_read = true;
 		sp->scanner_getc = scanner_getc_EOF;
+		fclose(sp->source);
 	} else {
 		sp->on_final_read = false;
 	}
@@ -93,9 +105,7 @@ scanner_ctor
 	return 0;
 }
 
-int 
-scanner_reload
-(struct scanner *sp) {
+int scanner_reload(struct scanner *sp) {
 
 	/* Select the new buffer */
 	char *fresh_buff;
@@ -126,6 +136,7 @@ scanner_reload
 
 	if(chars_read == 0) {
 		sp->scanner_getc = scanner_getc_EOF;
+		fclose(sp->source);
 	}
 
 	sp->lex_end = fresh_buff;
@@ -133,19 +144,13 @@ scanner_reload
 
 	return 0;
 }
-int
-scanner_getc_EOF
-(struct scanner *sp,
- int *c) {
+
+int scanner_getc_EOF(struct scanner *sp, int *c) {
 	*c = EOF;
 	return 0;
 }
 
-int
-scanner_getc
-(struct scanner *sp,
- int *c) {
-
+int scanner_getc(struct scanner *sp, int *c) {
 	
 	char val = *(sp->lex_end);
 	int c_val = val;
@@ -156,32 +161,41 @@ scanner_getc
 
 	if(sp->lex_end_index == sp->current_buffer_limit) { 
 		if(sp->on_final_read) {
-			// do something for final/close procedurse. 
-			// probably just send eof. 
 			sp->scanner_getc = scanner_getc_EOF;
+			fclose(sp->source);
 		} else {
 			scanner_reload(sp);
 		}
 	} 
 
 	return 0;
-
 }
 
 int main(void) {
 
 	printf("Lexical analysis software for the Raven compiler.\n");
-	
 	struct scanner s;
-	int ret_val = scanner_ctor(&s, "lexa_test_01.txt");
+	int ret_val = scanner_ctor(&s, "lexa_test_03.txt");
 
 	int c = 1;
+	int i = 0;
 
 	while(c != EOF) {
 		s.scanner_getc(&s, &c);
-		printf("%c", c);
-
+		i++;
 	}
+
+/*
+	FILE *fp = fopen("lexa_test_03.txt", "r");
+	
+	int c = 1;
+	int i = 0;
+	while(c != EOF) {
+		c = fgetc(fp);
+		i++;
+	}
+*/
+	printf("Done: %d\n", i);
 
 	return 0;
 }
