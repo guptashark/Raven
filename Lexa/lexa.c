@@ -150,6 +150,9 @@ struct scanner {
 	bool using_buff_A;
 	bool on_final_read;
 	bool scanning_terminated;
+
+	/* A function pointer seems perfect */
+	int (*scanner_getc)(struct scanner *, int *);
 };
 
 
@@ -168,8 +171,16 @@ struct scanner {
  */
 
 
+/* Need to forward declare this. */
+int scanner_getc(struct scanner *sp, int *c);
+
+/* Need to forward declare this too. */
+int scanner_getc_EOF(struct scanner *sp, int *c);
+
 /* Leave the scanner on stack. It's size is constant. */  
 /* may add other params as necessary. */
+
+
 int 
 scanner_ctor
 (struct scanner *sp, 
@@ -215,6 +226,7 @@ scanner_ctor
 			SCANNER_BUFFSIZE, 
 			sp->source);
 
+	printf("initial number of chars read: %d\n", chars_read);
 	if(chars_read < SCANNER_BUFFSIZE && chars_read > 0) {
 		sp->on_final_read = true;
 		sp->scanning_terminated = false;
@@ -229,6 +241,7 @@ scanner_ctor
 	sp->current_buffer_limit = chars_read;
 	/* proper settings for reload fn */
 	sp->using_buff_A = true;
+	sp->scanner_getc = scanner_getc;
 
 	return 0;
 }
@@ -258,12 +271,16 @@ scanner_reload
 	/* set the lex_end pointer to the start of the new buffer. */
 	/* Update the lex_end_index to 0.*/ 
 
+	//printf("The num_chars read are: %d\n", chars_read);
 	if(chars_read < SCANNER_BUFFSIZE) { 
 		sp->current_buffer_limit = chars_read;
+		sp->on_final_read = true;
 	}
 
 	if(chars_read == 0) {
+		printf("Read next buff, input turned out to be multiple of buff size.\n");
 		sp->scanning_terminated = true;
+		sp->scanner_getc = scanner_getc_EOF;
 		// sort of a tricky situation - need to set another flag! 
 		// can potentially swap functions so that on call, it rets
 		// nothing but eof. 
@@ -272,6 +289,14 @@ scanner_reload
 	sp->lex_end = fresh_buff;
 	sp->lex_end_index = 0;
 
+	return 0;
+}
+int
+scanner_getc_EOF
+(struct scanner *sp,
+ int *c) {
+
+	*c = EOF;
 	return 0;
 }
 
@@ -300,11 +325,12 @@ scanner_getc
  * Otherwise, continue on. 
  */
 	/* execution stops if we get here. */
+	/*
 	if(sp->scanning_terminated) {
 		*c = EOF;
 		return 0;
 	}
-		
+	*/	
 	char val = *(sp->lex_end);
 	int c_val = val;
 	*c = c_val;
@@ -317,12 +343,12 @@ scanner_getc
 			// do something for final/close procedurse. 
 			// probably just send eof. 
 			sp->scanning_terminated = true;
+			sp->scanner_getc = scanner_getc_EOF;
 		} else {
 			// buffer reload. 
 			scanner_reload(sp);
 		}
 	} 
-
 
 	return 0;
 /*
@@ -359,15 +385,16 @@ int main(void) {
 	printf("Lexical analysis software for the Raven compiler.\n");
 	
 	struct scanner s;
-	int ret_val = scanner_ctor(&s, "lexa_test_01.txt");
+	int ret_val = scanner_ctor(&s, "lexa_test_03.txt");
 
 	// the "char" we're reading into. 
 	
 	int c = 1;
 
 	while(c != EOF) {
-		scanner_getc(&s, &c);
-		printf("%c", c);
+		s.scanner_getc(&s, &c);
+
+//		printf("%x\n", c);
 	}
 
 	return 0;
