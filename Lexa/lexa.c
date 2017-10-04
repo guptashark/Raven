@@ -21,6 +21,7 @@ struct scanner {
 	char buff_B[SCANNER_BUFFSIZE];
 
 	int lex_end_index;
+	int lex_begin_index;
 	int current_buffer_limit;
 	char *lex_begin;
 	char *lex_end;
@@ -28,6 +29,7 @@ struct scanner {
 	FILE *source;
 
 	bool using_buff_A;
+	bool lex_begin_on_A;
 	bool on_final_read;
 
 	bool next_buff_already_loaded;
@@ -58,6 +60,10 @@ scanner_ctor
 	/* Is this the right way to set a pointer here... */
 	/* TODO is this right... */
 	sp->lex_end_index = 0;
+	sp->lex_begin_index = 0;
+
+	sp->lex_begin_on_A = true;
+
 	sp->lex_begin = sp->buff_A;
 	sp->lex_end = sp->buff_A;
 
@@ -116,8 +122,8 @@ int scanner_ungetc(struct scanner *sp) {
 		// TODO Return something other than 0... 
 		// and set an errno or something. 
 		return 0;
-	}
-
+	} 
+	
 	if(sp->lex_end_index > 0) {
 		sp->lex_end_index--;
 		sp->lex_end--;
@@ -129,7 +135,7 @@ int scanner_ungetc(struct scanner *sp) {
 		// which buffer are we on? 
 		if(sp->using_buff_A) {
 			sp->lex_end = &(sp->buff_B[SCANNER_BUFFSIZE - 1]);
-		else {
+		} else {
 			sp->lex_end = &(sp->buff_A[SCANNER_BUFFSIZE - 1]);
 		}
 
@@ -143,6 +149,13 @@ int scanner_ungetc(struct scanner *sp) {
 
 		return 0;
 	}
+
+
+	// we should never really get here... 
+	// TODO shouold this be here? 
+	return 0;
+
+
 }
 
 int scanner_reload(struct scanner *sp) {
@@ -157,7 +170,7 @@ int scanner_reload(struct scanner *sp) {
 
 	sp->using_buff_A = !(sp->using_buff_A);
 
-	if(!(sp->next_buffer_already_loaded)) {
+	if(!(sp->next_buff_already_loaded)) {
 	
 		size_t chars_read = fread(	
 					fresh_buff,
@@ -220,32 +233,124 @@ int scanner_pretty_print(struct scanner *sp) {
 	// Print location of pointers. 
 	// print flags. 
 	
+	int mod_lex_end_index = sp->lex_end_index * 2 + 1;
+	int mod_lex_begin_index = sp->lex_begin_index * 2 + 1; 
+
+	// print buffer A: 
+	
+	// print where the B pointer is. 
+	if(sp->lex_begin_on_A) {
+		for(int i = 0; i < mod_lex_begin_index; i++) {
+			printf(" ");
+		}
+
+		printf("B");
+	} 
+
+	printf("\n");
+
+	// print where the E pointer is. 
+	if(sp->using_buff_A) {
+		for(int i = 0; i < mod_lex_end_index; i++) {
+			printf(" ");
+		}
+
+		printf("E");
+	} 
+
+	printf("\n");
+
+	// Print the topline of the buffer: -----------
+	for(int i = 0; i < SCANNER_BUFFSIZE * 2 + 1; i++) {
+		printf("-");
+
+	}
+	printf("\n");
+
+	// print the values of the buffer: |a|b|c|d|
+	for(int i = 0 ; i < SCANNER_BUFFSIZE; i++) {
+		printf("|%c", sp->buff_A[i]);
+	}
+	printf("|\n");
+
+	// print the bottom line of the buffer: --------
+	for(int i = 0; i < SCANNER_BUFFSIZE * 2 + 1; i++) {
+		printf("-");
+
+	}
+	// extra newline for buffer B. 
+	printf("\n\n");
+
+	// Now do everything all over again to print buffer B. 
+
+	// print where the B pointer is. 
+	if(!(sp->lex_begin_on_A)) {
+		for(int i = 0; i < mod_lex_begin_index; i++) {
+			printf(" ");
+		}
+
+		printf("B");
+	} 
+
+	printf("\n");
+
+	// print where the E pointer is. 
+	if(!(sp->using_buff_A)) {
+		for(int i = 0; i < mod_lex_end_index; i++) {
+			printf(" ");
+		}
+
+		printf("E");
+	} 
+
+	printf("\n");
+
+	// Print the topline of the buffer: -----------
+	for(int i = 0; i < SCANNER_BUFFSIZE * 2 + 1; i++) {
+		printf("-");
+
+	}
+	printf("\n");
+
+	// print the values of the buffer: |a|b|c|d|
+	for(int i = 0 ; i < SCANNER_BUFFSIZE; i++) {
+		printf("|%c", sp->buff_B[i]);
+	}
+	printf("|\n");
+
+	// print the bottom line of the buffer: --------
+	for(int i = 0; i < SCANNER_BUFFSIZE * 2 + 1; i++) {
+		printf("-");
+
+	}
+	printf("\n");
+	return 0;
 }
 
 int main(void) {
 
 	printf("Lexical analysis software for the Raven compiler.\n");
 	struct scanner s;
-	int ret_val = scanner_ctor(&s, "lexa_test_03.txt");
+	int ret_val = scanner_ctor(&s, "lexa_test_02.txt");
 
-	int c = 1;
+	char c = 1;
 	int i = 0;
 
-	while(c != EOF) {
-		s.scanner_getc(&s, &c);
-		i++;
+	int c2 = 1; 
+	scanner_pretty_print(&s);
+	while(true) {
+
+		scanf("%c", &c);
+		if(c == 'g') {
+			scanner_getc(&s, &c2);
+			scanner_pretty_print(&s);
+
+		} else if(c == 'u') {
+			scanner_ungetc(&s);
+			scanner_pretty_print(&s);
+		}
 	}
 
-/*
-	FILE *fp = fopen("lexa_test_03.txt", "r");
-	
-	int c = 1;
-	int i = 0;
-	while(c != EOF) {
-		c = fgetc(fp);
-		i++;
-	}
-*/
 	printf("Done: %d\n", i);
 
 	return 0;
