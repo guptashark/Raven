@@ -154,8 +154,6 @@ int scanner_ungetc(struct scanner *sp) {
 	// we should never really get here... 
 	// TODO shouold this be here? 
 	return 0;
-
-
 }
 
 int scanner_reload(struct scanner *sp) {
@@ -193,6 +191,11 @@ int scanner_reload(struct scanner *sp) {
 			sp->scanner_getc = scanner_getc_EOF;
 			fclose(sp->source);
 		}
+	}
+
+	// reset it for the next time we call reload. 
+	if(sp->next_buff_already_loaded) {
+		sp->next_buff_already_loaded = false;
 	}
 
 	sp->lex_end = fresh_buff;
@@ -342,7 +345,7 @@ int main(void) {
 
 		scanf("%c", &c);
 		if(c == 'g') {
-			scanner_getc(&s, &c2);
+			s.scanner_getc(&s, &c2);
 			scanner_pretty_print(&s);
 
 		} else if(c == 'u') {
