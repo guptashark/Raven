@@ -66,6 +66,47 @@ the corresponding token name is given to that lexeme.
 	there. 
 
 2.6.5 A lexical Analyzer
+	Since the tokens might be holding different things, 
+	ie, a num constant holds a number, an id token holds
+	a pointer to something in the symbol table, we can 
+	set it up so that there are token subclasses that
+	have the appropriate fields. 
+	
+	The book uses an enum to describe the different
+	tags.
+	
+	
+	The scanner itself checks to see if it's got a 
+	digit. If yes, it tries to match a number and 
+	then return. (specific hardcoded rule) 
+	
+	if it is able to match an ID, it tries to do so, 
+	and looks it up to see if it is a keyword. If 
+	not, then it installs it into the dict. 
+	
+2.6.6 Exercises: 
+	1) 	Need to be able to take care of comments: 
+		// to end of line
+		/* to */ multiline
+		(Basic C style stuff) 	
+
+	2) 	Extension to understand relational operators
+
+	3) 	Extension to understand floating point nums
+
+Observations: 
+	While this does work as a lexlical analyzer, it
+	leaves things to be desired. Limitations: 
+	
+	* hard to add new patterns
+	* Hard to modify patterns (ie, what an ID should look like) 
+	* Not very modular, it's one massive function, unless we
+		want to start passing a pointer to the input stream around
+		to small functions that each process a certain type of lexeme. 
+
+
+
+
 	
 
 
