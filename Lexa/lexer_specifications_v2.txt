@@ -1,0 +1,72 @@
+From chapter 2.6: 
+
+Read characters from input and group into token objects. 
+Needs terminal symbol for parsing decisions... 
+
+Tokens have attribute values. 
+A token is a terminal with additional info. 
+
+Sequence of input chars that make a token is the lexeme. 
+
+We have sequences of regular exprs to identify what that 
+lexeme fits as. If a particular pattern is matched, then 
+the corresponding token name is given to that lexeme. 
+
+/////////
+
+2.6.1 Removal of Whitespace and comments 
+	Some languages need whitespace, but that is rare. 
+	Make a design desicion as to wether whitespace info should
+	be included. The point is to remove useless characters from 
+	the input and not pass them on to the parser. (The less work
+	that the parser has to do, the better) 
+
+2.6.2 Reading Ahead
+	Some strings require us to read ahead to determine the
+	token name, or correct lexeme. Ex: < and <=. Can't 
+	accept <, need to wait to see if it's <=. 
+
+	We use the input buffer, so that we don't have to fetch
+	one character at a time, and make ridiculous numbers
+	of IO calls. usually use a pointer to the character in 
+	the buffer that gets pushed forward and backward. 
+
+	Implementation hint: can potentially use a variable 
+	"peek" to store next char in buffer, considering 
+	we usually only have to look past one character. 
+
+2.6.3 Constants
+	We want to treat numbers as just "numbers" during
+	parsing, so the lexer is responsible for turning
+	strings of characters that make up numbers into 
+	number constants. This means the lexer needs the 
+	regex patterns to understand the different possible
+	representiations of numbers, (binary, hex, oct, etc) 
+
+	Special processing is needed. 
+
+2.6.4 Keywords and identifiers
+	There are set words that must be identified as keywords
+	There are also rules for identifiers that can name
+	things like arrays, variables, class names, etc. 
+
+	Main issue is that most keywords satisfy rules for 
+	identifiers so you need to know if an id is a keyword
+	with some post processing. Usually a dictionary lookup. 
+
+	IMPORTANT: In the symbol table, it's best to work with
+	pointers to the strings instead of the strings themselves. 
+
+	Reserved words are searched for either by initializing 
+	a symbol table with reserved words, or having some other
+	kind of lookup. 
+
+	If you can't find an id in the reserved words table, 
+	then you install it into the symbol table and go from 
+	there. 
+
+2.6.5 A lexical Analyzer
+	
+
+
+	
