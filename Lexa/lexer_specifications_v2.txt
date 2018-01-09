@@ -104,6 +104,58 @@ Observations:
 		want to start passing a pointer to the input stream around
 		to small functions that each process a certain type of lexeme. 
 
+**************************
+
+Symbol Tables
+
+since the symbol table is closely related to 
+the Lexer, it's worthwhile to read up on this before doing 
+the specs for chapter three. We won't do the intermediate
+code gen. 
+
+Scoping: 
+	In order to implement scopes, a new symbol table must
+	be created for each scope. 
+
+	The lexer, parser and semantic analyzer can all create
+	and use symbol table entries. In our case, since the 
+	parser is in a better position to understand the 
+	program structure, it will be doing the table entry 
+	creation. 
+
+	scope is super important to get right because 
+	different parts of the program use the same var
+	names, for instance "i, j, k" in loops, current, 
+	next, etc. 
+
+	When we create symbol tables, we think about what
+	level a symbol table is at. the table in question
+	must be contained within another table, and as such
+	have access to its variables. So, we can have the
+	idea of stacked symbol tables. 
+
+	Sometimes, there are other structs used, like a 
+	hash table to help get faster lookups. 
+
+	Work from the inside out. 
+	If you're in a symbol table, then search the current
+	table for the symbol, if you can't find it, keep 
+	working your way out until you do. If it's nowhere, 
+	that's an error. 
+
+	The way to implement nested symbol tables would be 
+	to have a symbol table point to the symbol table of
+	the enclosing block. 
+
+	Question: How do we get to a lower level table? 
+	If we can only go out in scope, how we descend in 
+	scope? Do we ever need to? Is it made and destroyed
+	on the fly? 
+
+	It may be worth our time to read more about symbol
+	tables before implementing one, or just rush in
+	with what we think will work. Either way, we don't
+	yet know enough to confidently create a symbol table. 
 
 
 
