@@ -14,7 +14,6 @@
  *
  * implement ungetc. 
  */
-
 struct scanner {
 
 	char buff_A[SCANNER_BUFFSIZE];
