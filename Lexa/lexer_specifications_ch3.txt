@@ -1,0 +1,121 @@
+This is the lexer learning stuff from 
+ch3 of the Purple dragon book. 
+
+The main tool used in modern language
+writing is lex, or Flex, which is a 
+lexical analyzer generator. 
+
+You want: 
+	-easily specify token patterns at a 
+		high level. 
+	-have a fast runtime. 
+
+The issue + solution. 
+	there needs to be something that 
+	processes those high level regex 
+	patterns and turns them into code 
+	that is fast. This cannot be the 
+	lexer, so we need to have a lexer
+	generator. That is whwat Flex is. 
+
+Tokens: 
+	Token name: what the parser gets. 
+	pattern: what the input must match
+		to be assigned a given token name. 
+	Lexeme: The string that matched the 
+		pattern. 
+
+	
+Common token names: 
+	ID
+	IF, ELSE
+	RELOP
+	NUMBER
+	LITERAL
+
+
+Some rules: 
+	keywords should get their own token names. 
+	relops can fall under the relop token name. 
+	All Identifiers fall under "ID" 
+	Each possible punctuation gets its own name. 
+
+When more than one lexeme exists for a possible token
+name, it's important to put in some attributes. 
+For instance, since both > and < will match RELOP, 
+we should have some kind of info packed in with the
+token so that the semantic analyzer can correctly 
+perform the computation. 
+
+There are decisions to make - For instance, the lexer
+can recognize a number, as a character string, but 
+not convert the string itself to a number, and leave
+the conversion job to someone else, opting to store
+the value in a token with the string representation 
+of the number as an attribute. 
+
+How errors arise: 
+	We get some kind of prefix that does not match
+	anything - rare but possible ie, weird stuff 
+	like "#" or @, or whatever. We can try to 
+	repair the input or go to an error state. 
+
+
+Exercise: 
+	How would someone go about reasonably dividing
+	up HTML documents? There are a lot of < and > 
+	as part of the syntax, with user definable tags
+	for things like XML
+
+	Ans: It's probably best to group things 
+	as open and close tags, which should be 
+	processed by the lexer. So, it'll recognize
+	that < "attribute" > is the opener, and 
+	a tag with the backslash is the closer, 
+	for the different token names. 
+
+
+Input buffering: 
+It makes little sense to read in one byte at a time. 
+Instead, use a pair of buffers. read into both of them 
+for starting up. When you reach the end of the second one, 
+reload the first buffer, and so on. 
+
+We need to do a check to ensure we're still in the buffer. 
+We can put an EOF at the end of each buffer so that when 
+we check the character and see an EOF, we'll know we're at
+the end of a buffer. This will save the check we do at every
+char read wondering if we're at the end of the buffer. EOF 
+still retains its value as something that specifies the end
+of the entire input itself. 
+
+This works because if we see an EOF, we can check if it's
+because we are at the buffer end + 1 or because we're out of
+input. We can't read an EOF into the last spot on the buffer, 
+since we read one less char, so we'll know for sure if we
+are at the end of input, or just the end of abuffer. 
+
+Excessively large lexemes
+How would we represent massive strings? Typically any string
+larger than N or twice the size of N, to really throw our 
+buffers into overflow mode? We need like, an issue 
+tracking file, or TODO  list, lol. 
+
+Alphabet
+We always work with ascii. No point in working with 
+unicode, way too many glyphs. 
+
+General rest of the chapter
+Basics of Regex to describe lexemes. 
+
+Main principle: 
+We can use regular expressions to describe the pattern 
+we want to match on lexemes. We thus need a way to 
+convert strings of regex into epsilon NFA's which 
+then should turn into NFA's which then should turn 
+into DFA's. The process should be refined enough 
+that the final DFA or NFA, whichever one we use to find
+matching prefixes of remaining input should be fast. 
+
+Given how limitiing strict regex is, we can obvs 
+extend it for ease of use. 
