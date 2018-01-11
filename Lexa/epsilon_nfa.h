@@ -11,10 +11,27 @@ our final automata and the higher level
 regex specifications. */
 
 struct epsilon_nfa_state {
+	// States we can transfer to on an epsilon
+	// transition. 
+	// Best case scenario is a linked list. 
+	// insertion is super easy, and we need
+	// to traverse the list anyways. 
 
+	// States we can get to from each 
+	// possible character. 
+	// implement as an array of linked list ptrs. 
+
+	// That way, from the above, we get all the 
+	// possible transitions. 
+
+	// We need to implement a decent linked list. 
+	
 };
 
 struct language {
+	// start state
+	// final states
+	// transitions encoded in nfa states
 
 };
 
