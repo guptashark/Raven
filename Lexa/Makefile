@@ -1,2 +1,2 @@
 all:
-	g++ epsilon_nfa.cpp
+	g++ -Wall epsilon_nfa.cpp
