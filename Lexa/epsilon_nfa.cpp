@@ -22,17 +22,20 @@ class eNFA_state {
 		// constructor is default. 
 
 		// add a character transition
-		int add_transit(char c, eNFA_state *destination) {
+		int add_transit(unsigned char c, eNFA_state *destination) {
 			symbol_transits[c].push_back(destination);
+			// can potentially return something else in case of errs. 
+			return 0;
 		};
 
 		int add_e_transit(eNFA_state *destination) {
 			epsilon_transits.push_back(destination);
+			return 0;
 		};
 
 		// "step" is to step on the char c in the 
 		// automaton, for simulation. 
-		list<eNFA_state *> *step(char c) {
+		list<eNFA_state *> *step(unsigned char c) {
 			return &(symbol_transits[c]);
 		};
 
@@ -41,17 +44,21 @@ class eNFA_state {
 		};
 
 		void pretty_print() {
-			cout << "num eps_transits: " << epsilon_transits.size();
+			cout << "num eps_transits: " << epsilon_transits.size() << endl;
+			list<eNFA_state *>::iterator i;
+			for(i = epsilon_transits.begin(); i != epsilon_transits.end(); i++) {
+				(*i)->pretty_print();
+			}
 
-			for(char c = 0; c < 256; c++) {
+			for(int c = 0; c < 256; c++) {
+
 				if(symbol_transits[c].size() > 0) {
-					cout << c << symbol_transits[c].size() << endl;
+					cout << (char)c << symbol_transits[c].size() << endl;
 				}
 			}
 
-			for(char c = 0; c < 256; c++) {
+			for(int c = 0; c < 256; c++) {
 				if(symbol_transits[c].size() > 0) {
-					list<eNFA_state *>::iterator i;
 					for(i = symbol_transits[c].begin(); i != symbol_transits[c].end(); i++) {
 						(*i)->pretty_print();
 					}
@@ -145,6 +152,7 @@ class eNFA_Language {
 			
 		void pretty_print(void) {
 			start->pretty_print();
+			cout << endl;
 		}	
 
 		// test to see if a string is in this language. 
@@ -155,5 +163,13 @@ class eNFA_Language {
 };
 int main(void) {
 
+	eNFA_Language lang_a = eNFA_Language('a');
+	eNFA_Language lang_b = eNFA_Language('b');
+
+	lang_a.pretty_print();
+	lang_b.pretty_print();
+
+	eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "concatenate");
+	lang_ab.pretty_print();
 	return 0;
 }
