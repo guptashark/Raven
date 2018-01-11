@@ -39,6 +39,25 @@ class eNFA_state {
 		list<eNFA_state *> *eps_step() {
 			return &epsilon_transits;
 		};
+
+		void pretty_print() {
+			cout << "num eps_transits: " << epsilon_transits.size();
+
+			for(char c = 0; c < 256; c++) {
+				if(symbol_transits[c].size() > 0) {
+					cout << c << symbol_transits[c].size() << endl;
+				}
+			}
+
+			for(char c = 0; c < 256; c++) {
+				if(symbol_transits[c].size() > 0) {
+					list<eNFA_state *>::iterator i;
+					for(i = symbol_transits[c].begin(); i != symbol_transits[c].end(); i++) {
+						(*i)->pretty_print();
+					}
+				}
+			}	
+		};
 };
 
 
@@ -123,7 +142,10 @@ class eNFA_Language {
 			new_acceptor->add_e_transit(start);
 			accept.push_back(new_acceptor);
 		};
-				
+			
+		void pretty_print(void) {
+			start->pretty_print();
+		}	
 
 		// test to see if a string is in this language. 
 		bool contains_string(string s);
