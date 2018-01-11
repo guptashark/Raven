@@ -1,2 +1,2 @@
 all:
-	g++ -Wall epsilon_nfa.cpp
+	g++ -Wall -Wextra epsilon_nfa.cpp
