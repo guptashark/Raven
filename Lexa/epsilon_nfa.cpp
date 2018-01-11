@@ -106,7 +106,24 @@ class eNFA_Language {
 			}
 		};
 
+		// right now, this can only ever be the kleene operator
+		eNFA_Language(eNFA_Language *a) {
+
+			start = new eNFA_state();
+			start->add_e_transit(a->start);
 		
+			eNFA_state *new_acceptor = new eNFA_state();	
+			list<eNFA_state *>::iterator i;
+
+			for(i = a->accept.begin(); i != a->accept.end(); i++) {
+				(*i)->add_e_transit(new_acceptor);
+			}
+		
+			start->add_e_transit(new_acceptor);
+			new_acceptor->add_e_transit(start);
+			accept.push_back(new_acceptor);
+		};
+				
 
 		// test to see if a string is in this language. 
 		bool contains_string(string s);
