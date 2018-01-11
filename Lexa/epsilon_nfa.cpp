@@ -162,14 +162,21 @@ class eNFA_Language {
 
 };
 int main(void) {
+	{
+		eNFA_Language lang_a = eNFA_Language('a');
+		eNFA_Language lang_b = eNFA_Language('b');
 
-	eNFA_Language lang_a = eNFA_Language('a');
-	eNFA_Language lang_b = eNFA_Language('b');
+		eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "concatenate");
+		lang_ab.pretty_print();
+	}
 
-	lang_a.pretty_print();
-	lang_b.pretty_print();
+	{
+		eNFA_Language lang_a = eNFA_Language('a');
+		eNFA_Language lang_b = eNFA_Language('b');
+			
+		eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "union");
+		lang_ab.pretty_print();
+	}
 
-	eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "concatenate");
-	lang_ab.pretty_print();
 	return 0;
 }
