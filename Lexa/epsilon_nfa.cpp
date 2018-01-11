@@ -8,6 +8,24 @@ class LexaRegex {
 	
 };
 
+class eNFA_Language {
+
+	// start state
+	// set of final states
+
+	// test to see if a string is in this language. 
+
+	// functional style creation of Langs. 
+	// Always produce a new eNFA_langauge obj, 
+	// leave the two previous ones as is. Later
+	// implementations may delete "consumed" langs. 
+	// 	- create from single char. 
+	//	- create from concat of two langs
+	// 	- create from Union of two langs
+	// 	- create from kleene of another lang. 
+
+};
+
 class eNFA_state {
 
 	private: 
