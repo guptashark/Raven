@@ -67,11 +67,11 @@ class eNFA_Language {
 		eNFA_Language(char c) {
 			start = new eNFA_state();
 			eNFA_state *acceptor = new eNFA_state();
-			start.add_transit(c, acceptor);
+			start->add_transit(c, acceptor);
 			accept.push_back(acceptor);
 		};
 
-		eNFA_language(eNFA_Language *a, eNFA_Language *b, string operation) {
+		eNFA_Language(eNFA_Language *a, eNFA_Language *b, string operation) {
 			if(operation == "concatenate") {
 				// take start state of "a", set as our start state. 
 				start = a->start;
@@ -79,25 +79,25 @@ class eNFA_Language {
 				// link together all finals of "a" to the start state 
 				// of "b". 
 				list<eNFA_state *>::iterator i;
-				for(i = a.accept.begin(); i != a.accept.end(); i++) {
-					(*i)->add_eps_transit(b.start);
+				for(i = a->accept.begin(); i != a->accept.end(); i++) {
+					(*i)->add_e_transit(b->start);
 				}
 			} else if(operation == "union") {
 				
 				// create a new state, add eps transitions
 				// to each of the start states in the other langs. 
 				start = new eNFA_state();
-				start.add_eps_transit(a.start);
-				start.add_eps_transit(b.start);
+				start->add_e_transit(a->start);
+				start->add_e_transit(b->start);
 				
 				// append accepter state lists, this is our list
 				// of final states. 
 				list<eNFA_state *>::iterator i;
-				for(i = a.accept.begin(); i != a.accept.end(); i++) {
+				for(i = a->accept.begin(); i != a->accept.end(); i++) {
 					accept.push_back(*i);
 				}
 
-				for(i = b.accept.begin(); i != b.accept.end(); i++) {
+				for(i = b->accept.begin(); i != b->accept.end(); i++) {
 					accept.push_back(*i);
 				}
 
@@ -105,9 +105,13 @@ class eNFA_Language {
 				cout << "Unrecognized operation." << endl;
 			}
 		};
+
+		
+
 		// test to see if a string is in this language. 
 		bool contains_string(string s);
-
+	
+		
 
 };
 int main(void) {
