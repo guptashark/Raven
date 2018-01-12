@@ -43,6 +43,28 @@ class eNFA_state {
 			return &epsilon_transits;
 		};
 
+		set<eNFA_state *> compute_eps_closure() {
+			set<eNFA_state *> ret;
+
+			// avoid excess computation. Also good base case. 
+			if(epsilon_transits.size() == 0) {
+				return ret;
+
+			set<eNFA_state *>::iterator i;
+			list<eNFA_state *>::iterator j;
+
+			for(j = epsilon_transits.begin(); j!= epsilon_transits.end(); j++) {
+				set<eNFA_state *> s = (*j)->compute_eps_closure();
+				for(i = s.begin(); i != s.end(); i++) {
+					ret.insert(*i);
+				}
+			}
+
+			return ret;
+		}
+
+
+
 		void pretty_print() {
 			cout << "num eps_transits: " << epsilon_transits.size() << endl;
 			list<eNFA_state *>::iterator i;
@@ -156,7 +178,20 @@ class eNFA_Language {
 		}	
 
 		// test to see if a string is in this language. 
-		bool contains_string(string s);
+		bool contains_string(string s) {
+			// follow every possible path. 
+			// don't care about efficiency in copy, 
+			// just make it work. 
+
+			// set of current states: 
+			set<eNFA_state *> current;
+			current.insert(start);
+
+			// consider that we have a set of states we are currently in. 
+			// Before we make a step on a character, we need the eps closure. 
+			// Construct a new set for all the states we could be in: 
+			
+		}
 	
 		
 
