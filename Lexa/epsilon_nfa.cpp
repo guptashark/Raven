@@ -213,38 +213,53 @@ class eNFA_Language {
 			// 5) add in all the transitions for the next char c. 
 			bool incomplete = true;
 			while(incomplete) {
-				cout << "A";
 				set<eNFA_state *> eps_close;
 				set<eNFA_state *>::iterator i;
 				for(i = current.begin(); i != current.end(); i++) {
-					cout <<"B";
 					list<eNFA_state *> *close = (*i)->eps_step();
 					list<eNFA_state *>::iterator j;
-					cout << "C";
 					for(j = close->begin(); j != close->end(); j++) {
 						eps_close.insert(*j);
 					}
-					cout <<"D";
 				}
 				incomplete = false;
-				cout <<"E";
 				for(i = eps_close.begin(); i != eps_close.end(); i++) {
 					if(current.find(*i) == current.end()) {
 						current.insert(*i);
 						incomplete = true;
 					}
 				}
-				cout<<"F";
 			}
 
 			// now, current is good. Now we can take a step on a char. 
+			/*
 			set<eNFA_state *>::iterator i;
 			for(i = current.begin(); i != current.end(); i++) {
 				(*i)->single_print();
 			}
 			return true;
+			*/
+
+		// now try to take the first char step. 
+			unsigned char c = s[0];
+			set<eNFA_state *> next_states;
+			set<eNFA_state *>::iterator i;
+			for(i = current.begin(); i != current.end(); i++) {
+				list<eNFA_state *> *next = (*i)->step(c);
+				list<eNFA_state *>::iterator j;
+				for(j = next->begin(); j != next->end(); j++) {
+					next_states.insert(*j);
+
+				}
+			}
+
+			if(next_states.size() == 0) {
+				cout << "Fall off automaton" << endl;
+			} else {
+				cout << next_states.size() << " is the number of immediate next states.";
+			}
+			return false;
 		}
-	
 };	
 
 int main(void) {
@@ -269,7 +284,7 @@ int main(void) {
 		eNFA_Language lang_a = eNFA_Language('a');
 		eNFA_Language lang_aa = eNFA_Language(&lang_a);
 	//	lang_aa.pretty_print();
-		lang_aa.contains_string("string");
+		lang_aa.contains_string("a");
 	}
 
 	return 0;
