@@ -1,3 +1,4 @@
+#include <set>
 #include <iostream> 
 #include <list> 
 #include <string>
@@ -49,6 +50,7 @@ class eNFA_state {
 			// avoid excess computation. Also good base case. 
 			if(epsilon_transits.size() == 0) {
 				return ret;
+			}
 
 			set<eNFA_state *>::iterator i;
 			list<eNFA_state *>::iterator j;
@@ -63,7 +65,16 @@ class eNFA_state {
 			return ret;
 		}
 
+		void single_print() {
+			cout << "num eps transitions: " << epsilon_transits.size() << endl;
+			
+			for(int c = 0; c < 256; c++) {
 
+				if(symbol_transits[c].size() > 0) {
+					cout << (char)c << symbol_transits[c].size() << endl;
+				}
+			}
+		}
 
 		void pretty_print() {
 			cout << "num eps_transits: " << epsilon_transits.size() << endl;
@@ -175,10 +186,11 @@ class eNFA_Language {
 		void pretty_print(void) {
 			start->pretty_print();
 			cout << endl;
-		}	
+		};
 
 		// test to see if a string is in this language. 
 		bool contains_string(string s) {
+			(void)s;
 			// follow every possible path. 
 			// don't care about efficiency in copy, 
 			// just make it work. 
@@ -191,12 +203,52 @@ class eNFA_Language {
 			// Before we make a step on a character, we need the eps closure. 
 			// Construct a new set for all the states we could be in: 
 			
+			// computationally hard... 
+			// easy solution!! 
+			// 1) get the eps_transits for just those in the current state, creating a union of those sets. 
+			// 2) add each element in the union to current. If an element from the union doesn't exist in current, set a flag. 
+			// 3) go back to step 1 if the flag is set. If it isn't then continue! 
+
+			// 4) Now we're in all the states we could possibly be in. 
+			// 5) add in all the transitions for the next char c. 
+			bool incomplete = true;
+			while(incomplete) {
+				cout << "A";
+				set<eNFA_state *> eps_close;
+				set<eNFA_state *>::iterator i;
+				for(i = current.begin(); i != current.end(); i++) {
+					cout <<"B";
+					list<eNFA_state *> *close = (*i)->eps_step();
+					list<eNFA_state *>::iterator j;
+					cout << "C";
+					for(j = close->begin(); j != close->end(); j++) {
+						eps_close.insert(*j);
+					}
+					cout <<"D";
+				}
+				incomplete = false;
+				cout <<"E";
+				for(i = eps_close.begin(); i != eps_close.end(); i++) {
+					if(current.find(*i) == current.end()) {
+						current.insert(*i);
+						incomplete = true;
+					}
+				}
+				cout<<"F";
+			}
+
+			// now, current is good. Now we can take a step on a char. 
+			set<eNFA_state *>::iterator i;
+			for(i = current.begin(); i != current.end(); i++) {
+				(*i)->single_print();
+			}
+			return true;
 		}
 	
-		
+};	
 
-};
 int main(void) {
+	
 	{
 		eNFA_Language lang_a = eNFA_Language('a');
 		eNFA_Language lang_b = eNFA_Language('b');
@@ -211,6 +263,13 @@ int main(void) {
 			
 		eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "union");
 		lang_ab.pretty_print();
+	}
+
+	{
+		eNFA_Language lang_a = eNFA_Language('a');
+		eNFA_Language lang_aa = eNFA_Language(&lang_a);
+	//	lang_aa.pretty_print();
+		lang_aa.contains_string("string");
 	}
 
 	return 0;
