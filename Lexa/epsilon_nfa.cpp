@@ -321,6 +321,8 @@ class eNFA_Language {
 
 
 class LexaRegex {
+	private: 
+		eNFA_Language *automaton;
 
 	// Lets start with super easy regex definitions 
 	// for langs where the alphabet is made of 2 letters. 
@@ -349,6 +351,37 @@ class LexaRegex {
 	// use brackets - if there is a bracket, you know you're going to be 
 	// getting arguments to that language. 
 
+	public: 
+		// for now, assume that s is only one character long. 
+		// adn that the character is either 'a' or 'b'
+		LexaRegex(string s) {
+
+			if(s.size() == 1) {
+				automaton = new eNFA_Language(s[0]);
+			} else {
+
+				// assume size is bigger than one, but lang still
+				// has just one word. 
+				string::iterator i = s.begin();
+				eNFA_Language *tmp = new eNFA_Language(*i);
+				i++;
+				// might want an empty state
+				for(;i != s.end(); i++) {
+					eNFA_Language *next = new eNFA_Language(*i);
+					eNFA_Language *my_tmp = new eNFA_Language(tmp, next, "concatenate");
+					tmp = my_tmp;
+				}
+
+				automaton = tmp;
+			}
+
+		}
+
+		bool match(string s) {
+			return automaton->contains_string(s);
+		}
+
+
 
 
 	
@@ -357,7 +390,7 @@ class LexaRegex {
 
 
 int main(void) {
-	
+/*	
 	{
 		eNFA_Language lang_a = eNFA_Language('a');
 		eNFA_Language lang_b = eNFA_Language('b');
@@ -384,6 +417,13 @@ int main(void) {
 		//lang_aa.pretty_print();
 		//lang_aa.contains_string("aaaa");
 	}
+*/
+	LexaRegex l_01("a");
+	l_01.match("a");
+	l_01.match("b");
 
+	LexaRegex l_02("abb");
+	l_02.match("abb");
+	l_02.match("bba");
 	return 0;
 }
