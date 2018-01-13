@@ -5,11 +5,6 @@
 
 using namespace std;
 
-class LexaRegex {
-
-	
-};
-
 class eNFA_state {
 
 	private: 
@@ -310,8 +305,6 @@ class eNFA_Language {
 				}
 			}
 
-
-			// 
 			set<eNFA_state *>::iterator set_it;
 			for(set_it = current.begin(); set_it != current.end(); set_it++) {
 				if(accept.find(*set_it) != accept.end()) {
@@ -325,6 +318,43 @@ class eNFA_Language {
 			return false;
 		}
 };		
+
+
+class LexaRegex {
+
+	// Lets start with super easy regex definitions 
+	// for langs where the alphabet is made of 2 letters. 
+
+	// regex with only one letter: 
+	// "a", "b". 
+	// we create the langauge with the eNFA_Language(char) ctor. 
+
+	// regex with word of length 2. 
+	// "aa", "ab", "ba", "bb"
+	// we get the first letter, turn into a language with Lang(char). 
+	// notice that the next character is a letter, turn that into a 
+	// language with Lang(char). Join the two with concatenation. 
+	
+	// regex of lang with only one word of finite length. 
+	// "abbaa", "aaaba", "bbbbbbbbbbbba", etc. 
+	// follow as above, create and stitch together languages as you go. 
+	// you need some way to attach the lang you're holding, and the 
+	// way to do it is to find what the next lang is. 
+
+	// regex of union of two langs. 
+	// "aab|abb" ... we need brackets... right? 
+	// "(aab)|(abb)" ... brackets help signify that this lang needs to be held. 
+
+	// we can create a tree structure to build the regex. 
+	// use brackets - if there is a bracket, you know you're going to be 
+	// getting arguments to that language. 
+
+
+
+	
+};
+
+
 
 int main(void) {
 	
