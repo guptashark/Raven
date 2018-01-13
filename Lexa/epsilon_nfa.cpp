@@ -110,7 +110,23 @@ class eNFA_Language {
 		// set of acceptor states
 		list<eNFA_state *> accept;
 
+		// since we seem to be making set unions so often, 
+		// this is helpful: 
+		void make_union(set<eNFA_state *> *s, set<eNFA_state *> *t) {
+			set<eNFA_state *>::iterator i; 
+			for(i = t->begin(); i != t->end(); i++) {
+				s->insert(*i);
+			}
+		}
 
+		// since we seem to have lots of places where we add 
+		// everything in a list to a set. 
+		void transfer_all(set<eNFA_state *> *s, list<eNFA_state *> *l) {
+			list<eNFA_state *>::iterator i;
+			for(i = l->begin(); i != l->end(); i++) {
+				s->insert(*i);
+			}
+		}
 	
 	// functional style creation of Langs. 
 	// Always produce a new eNFA_langauge obj, 
@@ -137,6 +153,7 @@ class eNFA_Language {
 
 				// link together all finals of "a" to the start state 
 				// of "b". 
+
 				list<eNFA_state *>::iterator i;
 				for(i = a->accept.begin(); i != a->accept.end(); i++) {
 					(*i)->add_e_transit(b->start);
@@ -217,10 +234,8 @@ class eNFA_Language {
 				set<eNFA_state *>::iterator i;
 				for(i = current.begin(); i != current.end(); i++) {
 					list<eNFA_state *> *close = (*i)->eps_step();
-					list<eNFA_state *>::iterator j;
-					for(j = close->begin(); j != close->end(); j++) {
-						eps_close.insert(*j);
-					}
+					
+					transfer_all(&eps_close, close);
 				}
 				incomplete = false;
 				for(i = eps_close.begin(); i != eps_close.end(); i++) {
@@ -246,17 +261,16 @@ class eNFA_Language {
 			set<eNFA_state *>::iterator i;
 			for(i = current.begin(); i != current.end(); i++) {
 				list<eNFA_state *> *next = (*i)->step(c);
-				list<eNFA_state *>::iterator j;
-				for(j = next->begin(); j != next->end(); j++) {
-					next_states.insert(*j);
+				transfer_all(&next_states, next);
 
-				}
 			}
 
 			if(next_states.size() == 0) {
+				
 				cout << "Fall off automaton" << endl;
+				return false;
 			} else {
-				cout << next_states.size() << " is the number of immediate next states.";
+				cout << next_states.size() << " is the number of immediate next states." << endl;
 			}
 			return false;
 		}
@@ -269,7 +283,9 @@ int main(void) {
 		eNFA_Language lang_b = eNFA_Language('b');
 
 		eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "concatenate");
-		lang_ab.pretty_print();
+		//lang_ab.pretty_print();
+		lang_ab.contains_string("a");
+		lang_ab.contains_string("b");
 	}
 
 	{
@@ -277,7 +293,9 @@ int main(void) {
 		eNFA_Language lang_b = eNFA_Language('b');
 			
 		eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "union");
-		lang_ab.pretty_print();
+		//lang_ab.pretty_print();
+		lang_ab.contains_string("a");
+		lang_ab.contains_string("b");
 	}
 
 	{
