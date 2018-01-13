@@ -158,6 +158,8 @@ class eNFA_Language {
 				for(i = a->accept.begin(); i != a->accept.end(); i++) {
 					(*i)->add_e_transit(b->start);
 				}
+				// copy over the b acceptors. 
+				accept = b->accept;
 			} else if(operation == "union") {
 				
 				// create a new state, add eps transitions
@@ -285,6 +287,31 @@ class eNFA_Language {
 
 			// if we're here, then we've exhausted the string. 
 			// check to see if we are in an accepting state. 
+			// but before that, we need to add in eps closure
+			// of the states in current into current. 
+			// time for some copypasta. 
+
+			
+			bool incomplete = true;
+			while(incomplete) {
+				set<eNFA_state *> eps_close;
+				set<eNFA_state *>::iterator i;
+				for(i = current.begin(); i != current.end(); i++) {
+					list<eNFA_state *> *close = (*i)->eps_step();
+					
+					transfer_all(&eps_close, close);
+				}
+				incomplete = false;
+				for(i = eps_close.begin(); i != eps_close.end(); i++) {
+					if(current.find(*i) == current.end()) {
+						current.insert(*i);
+						incomplete = true;
+					}
+				}
+			}
+
+
+			// 
 			set<eNFA_state *>::iterator set_it;
 			for(set_it = current.begin(); set_it != current.end(); set_it++) {
 				if(accept.find(*set_it) != accept.end()) {
@@ -307,7 +334,7 @@ int main(void) {
 
 		eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "concatenate");
 		//lang_ab.pretty_print();
-		//lang_ab.contains_string("a");
+		lang_ab.contains_string("ab");
 		//lang_ab.contains_string("b");
 	}
 
@@ -317,14 +344,14 @@ int main(void) {
 			
 		eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "union");
 		//lang_ab.pretty_print();
-		lang_ab.contains_string("a");
-		lang_ab.contains_string("b");
+		//lang_ab.contains_string("a");
+		//lang_ab.contains_string("b");
 	}
 
 	{
 		eNFA_Language lang_a = eNFA_Language('a');
 		eNFA_Language lang_aa = eNFA_Language(&lang_a);
-	//	lang_aa.pretty_print();
+		//lang_aa.pretty_print();
 		//lang_aa.contains_string("aaaa");
 	}
 
