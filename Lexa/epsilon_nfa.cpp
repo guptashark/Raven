@@ -205,16 +205,8 @@ class eNFA_Language {
 			cout << endl;
 		};
 
-		// test to see if a string is in this language. 
-		bool contains_string(string s) {
-			(void)s;
-			// follow every possible path. 
-			// don't care about efficiency in copy, 
-			// just make it work. 
 
-			// set of current states: 
-			set<eNFA_state *> current;
-			current.insert(start);
+		// test to see if a string is in this language. 
 
 			// consider that we have a set of states we are currently in. 
 			// Before we make a step on a character, we need the eps closure. 
@@ -228,23 +220,39 @@ class eNFA_Language {
 
 			// 4) Now we're in all the states we could possibly be in. 
 			// 5) add in all the transitions for the next char c. 
-			bool incomplete = true;
-			while(incomplete) {
-				set<eNFA_state *> eps_close;
-				set<eNFA_state *>::iterator i;
-				for(i = current.begin(); i != current.end(); i++) {
-					list<eNFA_state *> *close = (*i)->eps_step();
-					
-					transfer_all(&eps_close, close);
-				}
-				incomplete = false;
-				for(i = eps_close.begin(); i != eps_close.end(); i++) {
-					if(current.find(*i) == current.end()) {
-						current.insert(*i);
-						incomplete = true;
+	
+		bool contains_string(string s) {
+			(void)s;
+			// follow every possible path. 
+			// don't care about efficiency in copy, 
+			// just make it work. 
+
+			// set of current states: 
+			set<eNFA_state *> current;
+			current.insert(start);
+
+			string::iterator s_i;
+			for(s_i = s.begin(); s_i != s.end(); s_i++) {
+				
+				unsigned char c = *s_i;
+
+				bool incomplete = true;
+				while(incomplete) {
+					set<eNFA_state *> eps_close;
+					set<eNFA_state *>::iterator i;
+					for(i = current.begin(); i != current.end(); i++) {
+						list<eNFA_state *> *close = (*i)->eps_step();
+						
+						transfer_all(&eps_close, close);
+					}
+					incomplete = false;
+					for(i = eps_close.begin(); i != eps_close.end(); i++) {
+						if(current.find(*i) == current.end()) {
+							current.insert(*i);
+							incomplete = true;
+						}
 					}
 				}
-			}
 
 			// now, current is good. Now we can take a step on a char. 
 			/*
@@ -256,25 +264,30 @@ class eNFA_Language {
 			*/
 
 		// now try to take the first char step. 
-			unsigned char c = s[0];
-			set<eNFA_state *> next_states;
-			set<eNFA_state *>::iterator i;
-			for(i = current.begin(); i != current.end(); i++) {
-				list<eNFA_state *> *next = (*i)->step(c);
-				transfer_all(&next_states, next);
+				set<eNFA_state *> next_states;
+				set<eNFA_state *>::iterator i;
+				for(i = current.begin(); i != current.end(); i++) {
+					list<eNFA_state *> *next = (*i)->step(c);
+					transfer_all(&next_states, next);
+				}
 
+				if(next_states.size() == 0) {
+					
+					cout << "Fell off automaton" << endl;
+					return false;
+				} else {
+					cout << "processed \"" << c << "\""<< endl;
+					cout << next_states.size() << " is the number of immediate next states." << endl;
+				}
+				// set "current" to next_states. 
+				current = next_states;
 			}
 
-			if(next_states.size() == 0) {
-				
-				cout << "Fall off automaton" << endl;
-				return false;
-			} else {
-				cout << next_states.size() << " is the number of immediate next states." << endl;
-			}
+			// if we're here, then we've exhausted the string. 
+			// check to see if we are in an accepting state. 
 			return false;
 		}
-};	
+};		
 
 int main(void) {
 	
@@ -284,8 +297,8 @@ int main(void) {
 
 		eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "concatenate");
 		//lang_ab.pretty_print();
-		lang_ab.contains_string("a");
-		lang_ab.contains_string("b");
+		//lang_ab.contains_string("ab");
+		//lang_ab.contains_string("b");
 	}
 
 	{
@@ -294,15 +307,15 @@ int main(void) {
 			
 		eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "union");
 		//lang_ab.pretty_print();
-		lang_ab.contains_string("a");
-		lang_ab.contains_string("b");
+		//lang_ab.contains_string("a");
+		//lang_ab.contains_string("b");
 	}
 
 	{
 		eNFA_Language lang_a = eNFA_Language('a');
 		eNFA_Language lang_aa = eNFA_Language(&lang_a);
 	//	lang_aa.pretty_print();
-		lang_aa.contains_string("a");
+		lang_aa.contains_string("aaaba");
 	}
 
 	return 0;
