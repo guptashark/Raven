@@ -108,7 +108,7 @@ class eNFA_Language {
 		eNFA_state *start;
 
 		// set of acceptor states
-		list<eNFA_state *> accept;
+		set<eNFA_state *> accept;
 
 		// since we seem to be making set unions so often, 
 		// this is helpful: 
@@ -143,7 +143,7 @@ class eNFA_Language {
 			start = new eNFA_state();
 			eNFA_state *acceptor = new eNFA_state();
 			start->add_transit(c, acceptor);
-			accept.push_back(acceptor);
+			accept.insert(acceptor);
 		};
 
 		eNFA_Language(eNFA_Language *a, eNFA_Language *b, string operation) {
@@ -154,7 +154,7 @@ class eNFA_Language {
 				// link together all finals of "a" to the start state 
 				// of "b". 
 
-				list<eNFA_state *>::iterator i;
+				set<eNFA_state *>::iterator i;
 				for(i = a->accept.begin(); i != a->accept.end(); i++) {
 					(*i)->add_e_transit(b->start);
 				}
@@ -168,13 +168,13 @@ class eNFA_Language {
 				
 				// append accepter state lists, this is our list
 				// of final states. 
-				list<eNFA_state *>::iterator i;
+				set<eNFA_state *>::iterator i;
 				for(i = a->accept.begin(); i != a->accept.end(); i++) {
-					accept.push_back(*i);
+					accept.insert(*i);
 				}
 
 				for(i = b->accept.begin(); i != b->accept.end(); i++) {
-					accept.push_back(*i);
+					accept.insert(*i);
 				}
 
 			} else {
@@ -189,7 +189,7 @@ class eNFA_Language {
 			start->add_e_transit(a->start);
 		
 			eNFA_state *new_acceptor = new eNFA_state();	
-			list<eNFA_state *>::iterator i;
+			set<eNFA_state *>::iterator i;
 
 			for(i = a->accept.begin(); i != a->accept.end(); i++) {
 				(*i)->add_e_transit(new_acceptor);
@@ -197,7 +197,7 @@ class eNFA_Language {
 		
 			start->add_e_transit(new_acceptor);
 			new_acceptor->add_e_transit(start);
-			accept.push_back(new_acceptor);
+			accept.insert(new_acceptor);
 		};
 			
 		void pretty_print(void) {
@@ -285,6 +285,16 @@ class eNFA_Language {
 
 			// if we're here, then we've exhausted the string. 
 			// check to see if we are in an accepting state. 
+			set<eNFA_state *>::iterator set_it;
+			for(set_it = current.begin(); set_it != current.end(); set_it++) {
+				if(accept.find(*set_it) != accept.end()) {
+					cout << "Accepting." << endl;
+					return true; 
+				}
+			}
+			
+			// we're not in any accept states. 
+			cout << "Rejecting." << endl;
 			return false;
 		}
 };		
@@ -297,7 +307,7 @@ int main(void) {
 
 		eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "concatenate");
 		//lang_ab.pretty_print();
-		//lang_ab.contains_string("ab");
+		//lang_ab.contains_string("a");
 		//lang_ab.contains_string("b");
 	}
 
@@ -307,15 +317,15 @@ int main(void) {
 			
 		eNFA_Language lang_ab = eNFA_Language(&lang_a, &lang_b, "union");
 		//lang_ab.pretty_print();
-		//lang_ab.contains_string("a");
-		//lang_ab.contains_string("b");
+		lang_ab.contains_string("a");
+		lang_ab.contains_string("b");
 	}
 
 	{
 		eNFA_Language lang_a = eNFA_Language('a');
 		eNFA_Language lang_aa = eNFA_Language(&lang_a);
 	//	lang_aa.pretty_print();
-		lang_aa.contains_string("aaaba");
+		//lang_aa.contains_string("aaaa");
 	}
 
 	return 0;
