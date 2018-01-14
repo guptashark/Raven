@@ -53,6 +53,35 @@ class ContextFreeGrammar {
 		}
 };
 
+class CFGNode {
+
+	// both terminals and non terminals have names. 	
+	string name;
+};
+
+
+
+class NonTerminalNode: CFGNode {
+	private: 
+		// inherit string name member var from CFGNode
+
+		// the list of children
+		list<CFGNode *> children;
+	public: 
+		// nothing yet. 
+};
+
+
+class TerminalNode: CFGNode {
+	private: 
+		// inherit string name member var from CFGNode
+		Token *token;	// could be null, 
+						// if this is LPAREN or something. 
+	public: 
+		// nothing yet... need a way to assign that string .
+};
+
+
 int main(void) {
 	
 	
