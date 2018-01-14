@@ -6,6 +6,29 @@
 
 using namespace std;
 
+/* General Possible ideas and resources for implementing regex... 
+
+	- CFG to implment the regex engine. 
+	- 	prefixed regex. 
+	-	ecma script regex. 
+	- 	grep and egrep docs
+	- 	
+	- 	postfix regex
+	- 
+
+	General layout of Lexer: 
+	-User defined matching on regex
+	-Regex implemented using CFG parsing. 
+	-Turn regex into eNFA
+	-Turn eNFA into DFA
+	-send lexer outputs to a "real" parser. 
+	
+
+
+
+
+*/
+
 class Production {
 
 	private:
