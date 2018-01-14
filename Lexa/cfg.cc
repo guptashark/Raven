@@ -22,11 +22,20 @@ using namespace std;
 	-Turn regex into eNFA
 	-Turn eNFA into DFA
 	-send lexer outputs to a "real" parser. 
-	
+*/
 
+/* General parsing requirements to know: 
 
+	-LL(k) parsing, and how it works
+	-Transforming grammars to not be left recursive
+	-LR parsing, and how it works
+	-LALR parsing
+	-SLR parsing
+	-Speed and efficiency testing, average cases, etc.
 
-
+	-Full CFG parsing
+	-General parse tree transformations
+	-Attachment to symbol tables. 
 */
 
 class Production {
