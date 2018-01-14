@@ -25,8 +25,38 @@ class Production {
 };
 
 
-int main(void) {
+class ContextFreeGrammar {
 
+	private: 
+		set<string> non_terminals;
+		set<string> terminals;
+
+		list<Production> rules;
+
+		// the next things are generated for each nonterminal 
+		// first sets
+		// follow sets. 
+
+	public: 
+		ContextFreeGrammar(set<string> non_terminals, set<string> terminals): 
+		non_terminals(non_terminals), terminals(terminals) {};
+
+		// is this efficient? 
+		void addRule(string head, list<string> body) {
+			rules.push_back(Production(head, body));
+		}
+
+		void prettyPrint() {
+			for(auto i = rules.begin(); i != rules.end(); i++) {
+				(*i).prettyPrint();
+			}
+		}
+};
+
+int main(void) {
+	
+	
+	
 	Production p("A", {"b", "*", "c"});
 	p.prettyPrint();
 }
