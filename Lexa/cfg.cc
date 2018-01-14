@@ -38,6 +38,28 @@ using namespace std;
 	-Attachment to symbol tables. 
 */
 
+
+/* First Sets: 
+	
+	* Need to calculate a "First" set, 
+	which is effectively the set of terminals that
+	can signal the start of a production of a particular
+	non terminal. Ie, if we see a terminal, we'll be able
+	to use the first set to determine which non-term we
+	are deriving and such. 
+
+	* If there is a production where terminal is first, 
+	then add in that terminal to the set. 
+	* If there is a non-terminal, then add the first set
+	of that non-terminal to the set of this nonTerminal. 
+	* If there is a non-terminal that has an epsilon production, 
+	then add in the following symbol in the production. If it
+	is a terminal, then we're done, if it is a non-terminal, 
+	then proceed to add its first set. 
+
+
+
+*/
 class Production {
 
 	private:
