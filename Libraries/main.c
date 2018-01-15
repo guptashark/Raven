@@ -104,11 +104,19 @@ int data_gen_init
 	 
 int data_gen_generate
 (struct data_gen *dg_p, struct labeled_point **lp_dp) {
-	float x_1 = (float)((rand() % 20) - 10);
-	float x_2 = (float)((rand() % 20) - 10);
 	struct domain_point *dp = NULL;
-	domain_point_init(&dp, x_1, x_2);
-	int label = dg_p->label_fn(dp);
+	int label = 0;
+
+	do {
+		float x_1 = (float)((rand() % 20) - 10);
+		float x_2 = (float)((rand() % 20) - 10);
+		domain_point_init(&dp, x_1, x_2);
+		label = dg_p->label_fn(dp);
+		if(label == 0) {
+			free(dp);
+		}
+	} while(label == 0);
+
 	
 	labeled_point_init(lp_dp, dp, label);
 	return 0;
@@ -118,11 +126,14 @@ int data_gen_generate
 // I sure hope so... could run into some tough 
 // problems... 
 int label_fn_01(struct domain_point *dp) {
-	float val = dp->x_1 * 3.125 + dp->x_2 * 2;
+	float val = dp->x_1 * 3 + dp->x_2 * 2;
+
 	if(val > 0) {
 		return 1;
-	} else {
+	} else if(val < 0) {
 		return -1;
+	} else {
+		return 0;
 	}
 }
 
@@ -215,7 +226,7 @@ int main(void) {
 
 	struct training_set ts;
 	struct training_set *ts_p = &ts;
-	training_set_init(ts_p, dg_p, 100);
+	training_set_init(ts_p, dg_p, 20);
 
 	/* Now we get to the part where we do the linear programming... 
 	* and simplex algo... 
@@ -226,6 +237,7 @@ int main(void) {
 	
 	float *w = perceptron(ts_p);
 	printf("(%.2f, %.2f) is the splitter.\n", w[0], w[1]);
+	printf("%f is the ratio.\n", w[1]/w[0]);
 	
 	return 0;
 		
