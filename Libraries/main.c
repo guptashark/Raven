@@ -113,6 +113,7 @@ int data_gen_generate
 		domain_point_init(&dp, x_1, x_2);
 		label = dg_p->label_fn(dp);
 		if(label == 0) {
+			printf("Found point on top of line\n");
 			free(dp);
 		}
 	} while(label == 0);
@@ -122,11 +123,8 @@ int data_gen_generate
 	return 0;
 }
 
-// TODO Is it allowed to get a 0? I mean... 
-// I sure hope so... could run into some tough 
-// problems... 
 int label_fn_01(struct domain_point *dp) {
-	float val = dp->x_1 * 3 + dp->x_2 * 2;
+	float val = dp->x_1 * 3 + dp->x_2 * 2  - 4;
 
 	if(val > 0) {
 		return 1;
@@ -183,9 +181,14 @@ float *
 perceptron
 (struct training_set *ts) {
 
-	float *w = malloc(sizeof(float) * 2);
+	float *w = malloc(sizeof(float) * 3);
+
+	// our "b" term, added every time as the bias. 
 	w[0] = 0;
+
+	// corresponds to x_1 and x_2
 	w[1] = 0;
+	w[2] = 0;
 
 	bool was_modified = true;
 	int num_iterations = 0;
@@ -199,10 +202,12 @@ perceptron
 			struct domain_point *dp = lp->dp;
 			int label = lp->label;
 
-			int tmp = w[0] * dp->x_1 + w[1] * dp->x_2;
+			int tmp = (w[0] + w[1] * dp->x_1) + (w[2] * dp->x_2);
 			if(label * tmp <= 0) {
-				w[0] = w[0] + label * dp->x_1;
-				w[1] = w[1] + label * dp->x_2;
+				w[0] = w[0] + label;
+				w[1] = w[1] + label * dp->x_1;
+				w[2] = w[2] + label * dp->x_2;
+				
 				was_modified = true;
 			}
 		}
@@ -226,7 +231,7 @@ int main(void) {
 
 	struct training_set ts;
 	struct training_set *ts_p = &ts;
-	training_set_init(ts_p, dg_p, 20);
+	training_set_init(ts_p, dg_p, 100);
 
 	/* Now we get to the part where we do the linear programming... 
 	* and simplex algo... 
@@ -236,8 +241,9 @@ int main(void) {
 	//training_set_print(ts_p);
 	
 	float *w = perceptron(ts_p);
-	printf("(%.2f, %.2f) is the splitter.\n", w[0], w[1]);
-	printf("%f is the ratio.\n", w[1]/w[0]);
+	printf("%.2f * x_1 +  %.2f * x_2 + %.2f\n", w[1], w[2], w[0]);
+	printf("3 * x_1 + 2 * x_2 - 4 is realizable fn\n");
+	printf("%f calculated vs 0.66 actual is the ratio.\n", w[2]/w[1] );
 	
 	return 0;
 		
