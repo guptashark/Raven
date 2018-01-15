@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
 
 // We need several components: 
 /*
@@ -112,8 +114,11 @@ int data_gen_generate
 	return 0;
 }
 
+// TODO Is it allowed to get a 0? I mean... 
+// I sure hope so... could run into some tough 
+// problems... 
 int label_fn_01(struct domain_point *dp) {
-	float val = dp->x_1 * 3 + dp->x_2 * 5 - 7;
+	float val = dp->x_1 * 3.125 + dp->x_2 * 2;
 	if(val > 0) {
 		return 1;
 	} else {
@@ -163,10 +168,45 @@ int training_set_print
 
 
 
+float *
+perceptron
+(struct training_set *ts) {
+
+	float *w = malloc(sizeof(float) * 2);
+	w[0] = 0;
+	w[1] = 0;
+
+	bool was_modified = true;
+	int num_iterations = 0;
+
+	while(was_modified) {
+		was_modified = false;
+
+		for(int i = 0; i < ts->num_pairs; i++) {
+
+			struct labeled_point *lp = ts->sequence[i];
+			struct domain_point *dp = lp->dp;
+			int label = lp->label;
+
+			int tmp = w[0] * dp->x_1 + w[1] * dp->x_2;
+			if(label * tmp <= 0) {
+				w[0] = w[0] + label * dp->x_1;
+				w[1] = w[1] + label * dp->x_2;
+				was_modified = true;
+			}
+		}
+		num_iterations++;
+	}
+	
+	printf("It took %d iterations. \n", num_iterations);
+	return w;
+
+}
+
 int main(void) {
 
 	// initialize random state for generator
-	srand(1);
+	srand(time(NULL));
 
 	// initialize data generator
 	struct data_gen dg;
@@ -175,15 +215,17 @@ int main(void) {
 
 	struct training_set ts;
 	struct training_set *ts_p = &ts;
-	training_set_init(ts_p, dg_p, 10);
+	training_set_init(ts_p, dg_p, 100);
 
 	/* Now we get to the part where we do the linear programming... 
 	* and simplex algo... 
 	* and understanding how to find a linear separator. 
 	* In the realizable case. 
 	*/
-	training_set_print(ts_p);
-		
+	//training_set_print(ts_p);
+	
+	float *w = perceptron(ts_p);
+	printf("(%.2f, %.2f) is the splitter.\n", w[0], w[1]);
 	
 	return 0;
 		
