@@ -73,10 +73,39 @@ class Terminal: public CfgSymbol {
 		// don't have any productions... 
 	public: 
 		Terminal(string name): CfgSymbol(name) {};
-
-
 };
 
+class ContextFreeGrammar {
+
+	private: 
+	// I mean... these can be specified to be NonTerminal ptrs... right? 	
+		map<string, CfgSymbol *> non_terminals;
+
+	// and these as Terminal ptrs? 
+		map<string, CfgSymbol *> terminals;
+
+	public: 
+		//... maybe learn how to easily initialize lists and such....
+		// nt is nonterminals
+		// t is terminals;
+		ContextFreeGrammar(list<string> nt, list<string> t) {
+			for(auto i = nt.begin(); i != nt.end(); i++) {
+				non_terminals.insert(pair<string, CfgSymbol>((*i), new NonTerminal(*i)));
+			}
+
+			for(auto i = t.begin(); i != t.end(); i++) {
+				terminals.insert(pair<string, CfgSymbol>((*i), new Terminal(*i)));
+			}
+		}
+	
+		void addRule(string head, list<string> body) {
+			// assume it exists... for now 
+			NonTerminal *head_ptr = non_terminals[head];
+			// create a new list with the body... we need a set of "rules" 
+
+		}
+
+};
 
 int main(void) {
 
@@ -90,10 +119,7 @@ int main(void) {
 	Terminal c("c");
 
 	list<CfgSymbol *> l = {&A, &B, &a, &b};
-
-
 	//list<CfgSymbol *> p2 = {&B, &B, &A};
-	
 	C.addProduction(&l);
 
 	cout << C;
