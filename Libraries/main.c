@@ -30,13 +30,13 @@ struct domain_point {
 	// may not want to leave them as ints... 
 	// we'll see if it's compatible with floats. 
 	// ... later
-	int x_1;
-	int x_2;
+	float x_1;
+	float x_2;
 };
 
 int 
 domain_point_init
-(struct domain_point **dp_dp, int x_1, int x_2) {
+(struct domain_point **dp_dp, float x_1, float x_2) {
 	struct domain_point *ret = malloc(sizeof(struct domain_point));
 	ret->x_1 = x_1;
 	ret->x_2 = x_2;
@@ -49,7 +49,7 @@ domain_point_init
 
 int domain_point_print
 (struct domain_point *dp_p) {
-	printf("(%d, %d)", dp_p->x_1, dp_p->x_2);
+	printf("(%.2f, %.2f)", dp_p->x_1, dp_p->x_2);
 	return 0;
 }
 
@@ -102,8 +102,8 @@ int data_gen_init
 	 
 int data_gen_generate
 (struct data_gen *dg_p, struct labeled_point **lp_dp) {
-	int x_1 = (rand() % 20) - 10;
-	int x_2 = (rand() % 20) - 10;
+	float x_1 = (float)((rand() % 20) - 10);
+	float x_2 = (float)((rand() % 20) - 10);
 	struct domain_point *dp = NULL;
 	domain_point_init(&dp, x_1, x_2);
 	int label = dg_p->label_fn(dp);
@@ -113,7 +113,7 @@ int data_gen_generate
 }
 
 int label_fn_01(struct domain_point *dp) {
-	int val = dp->x_1 * 3 + dp->x_2 * 5 - 7;
+	float val = dp->x_1 * 3 + dp->x_2 * 5 - 7;
 	if(val > 0) {
 		return 1;
 	} else {
@@ -166,7 +166,7 @@ int training_set_print
 int main(void) {
 
 	// initialize random state for generator
-	srand(0);
+	srand(1);
 
 	// initialize data generator
 	struct data_gen dg;
@@ -177,6 +177,11 @@ int main(void) {
 	struct training_set *ts_p = &ts;
 	training_set_init(ts_p, dg_p, 10);
 
+	/* Now we get to the part where we do the linear programming... 
+	* and simplex algo... 
+	* and understanding how to find a linear separator. 
+	* In the realizable case. 
+	*/
 	training_set_print(ts_p);
 		
 	
