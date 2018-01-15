@@ -26,7 +26,7 @@ class CfgSymbol {
 
 		CfgSymbol(string name): name(name) {};
 
-	public: 
+	public:
 		string getName(void) {return name;};
 
 };
@@ -67,14 +67,14 @@ class NonTerminal: public CfgSymbol {
 		}
 };
 
-
-class Terminal: protected CfgSymbol {
-	protected: 
+class Terminal: public CfgSymbol {
 		// inherit name, first set
 
 		// don't have any productions... 
 	public: 
 		Terminal(string name): CfgSymbol(name) {};
+
+
 };
 
 
@@ -84,22 +84,17 @@ int main(void) {
 	NonTerminal A("A");
 	NonTerminal B("B");
 	NonTerminal C("C");
-
 	
 	Terminal a("a");
 	Terminal b("b");
 	Terminal c("c");
 
+	list<CfgSymbol *> l = {&A, &B, &a, &b};
 
-	list<CfgSymbol *> l;
-
-	l.push_back(&A);
-	l.push_back(&B);
 
 	//list<CfgSymbol *> p2 = {&B, &B, &A};
 	
 	C.addProduction(&l);
-	//C.addProduction(p2);
 
 	cout << C;
 
