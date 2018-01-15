@@ -26,7 +26,6 @@
 	* the second. 
 */
 
-
 struct domain_point {
 	// may not want to leave them as ints... 
 	// we'll see if it's compatible with floats. 
@@ -84,14 +83,6 @@ int labeled_point_print
 	return 0;
 }
 
-struct training_set {
-	int num_points;
-
-	// an array of labeled point ptrs. 
-	struct labeled_point **first;
-};
-
-
 /* data generator
 	randomly generates domain point
 	determines label for it (using f)
@@ -130,6 +121,46 @@ int label_fn_01(struct domain_point *dp) {
 	}
 }
 
+// this is where it all comes together - 
+// we set the number of samples we want, 
+// and generate them, since the label
+// function is already set in the data_gen. 
+struct training_set {
+	// number of pairs of labeled points. 
+	// also maybe understood as length of sequence.
+	int num_pairs;
+
+	// an array of labeled point ptrs. 
+	struct labeled_point **sequence;
+};
+
+int training_set_init
+(struct training_set *ts, struct data_gen *dg_p, int num_pairs) {
+
+
+	ts->num_pairs = num_pairs;
+
+	struct labeled_point **arr = NULL;
+	arr = malloc(sizeof(struct labeled_point *) * num_pairs);
+
+	for(int i = 0; i < num_pairs; i++) {
+		data_gen_generate(dg_p, &(arr[i]));
+	}
+
+	ts->sequence = arr;
+	return 0;
+}
+
+int training_set_print
+(struct training_set *ts) {
+	printf("Num Pairs: %d\n", ts->num_pairs);
+	for(int i = 0; i < ts->num_pairs; i++) {
+		labeled_point_print(ts->sequence[i]);
+	}
+
+	return 0;
+}
+
 
 
 int main(void) {
@@ -141,12 +172,13 @@ int main(void) {
 	struct data_gen dg;
 	struct data_gen *dg_p = &dg;
 	data_gen_init(dg_p, label_fn_01);
-	
-	struct labeled_point *lp_01 = NULL;
-	data_gen_generate(dg_p, &lp_01);
 
-	labeled_point_print(lp_01);
+	struct training_set ts;
+	struct training_set *ts_p = &ts;
+	training_set_init(ts_p, dg_p, 10);
 
+	training_set_print(ts_p);
+		
 	
 	return 0;
 		
