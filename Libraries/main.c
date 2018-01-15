@@ -48,8 +48,6 @@ domain_point_init
 	return 0;
 }
 
-
-
 int domain_point_print
 (struct domain_point *dp_p) {
 	printf("(%d, %d)", dp_p->x_1, dp_p->x_2);
@@ -94,18 +92,62 @@ struct training_set {
 };
 
 
+/* data generator
+	randomly generates domain point
+	determines label for it (using f)
+	produces the labeled point.
+*/
+struct data_gen {
+	// labeling function
+	// f takes in a domain point, outputs a label. 
+	int (*label_fn)(struct domain_point *);
+};
+
+int data_gen_init
+(struct data_gen *dg_p, int (*label_fn)(struct domain_point *)) {
+	dg_p->label_fn = label_fn;
+	return 0;
+}
+	 
+int data_gen_generate
+(struct data_gen *dg_p, struct labeled_point **lp_dp) {
+	int x_1 = (rand() % 20) - 10;
+	int x_2 = (rand() % 20) - 10;
+	struct domain_point *dp = NULL;
+	domain_point_init(&dp, x_1, x_2);
+	int label = dg_p->label_fn(dp);
+	
+	labeled_point_init(lp_dp, dp, label);
+	return 0;
+}
+
+int label_fn_01(struct domain_point *dp) {
+	int val = dp->x_1 * 3 + dp->x_2 * 5 - 7;
+	if(val > 0) {
+		return 1;
+	} else {
+		return -1;
+	}
+}
+
+
+
 int main(void) {
 
 	// initialize random state for generator
 	srand(0);
 
+	// initialize data generator
+	struct data_gen dg;
+	struct data_gen *dg_p = &dg;
+	data_gen_init(dg_p, label_fn_01);
+	
+	struct labeled_point *lp_01 = NULL;
+	data_gen_generate(dg_p, &lp_01);
 
-	struct domain_point *d1 = NULL;
-	domain_point_init(&d1, 4, 5);
-	struct labeled_point *l1 = NULL;
-	labeled_point_init(&l1, d1, 1);
-	printf("Done.\n");
+	labeled_point_print(lp_01);
 
-	labeled_point_print(l1);
-
+	
+	return 0;
+		
 }
