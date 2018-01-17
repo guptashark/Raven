@@ -37,6 +37,17 @@ struct linear_program {
 
 };
 
+// init fn for linear program
+int linear_program_init(struct linear_program **lp_dp);
+
+// create this from a linear program. 
+struct standard_LP {
+
+};
+
+
+// init function for standard LP. 
+int standard_LP_init(struct standard_LP **slp_dp);
 
 int main(void) {
 
