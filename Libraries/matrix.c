@@ -88,6 +88,35 @@ matrix_add_row
 }
 // 
 
+// Need to decide how matrix multiplication is going to work. 
+// on every mult, do we create a new matrix? 
+// it kind of seems so. 
+
+// General form of working with matrices: 
+// An operation may produce a new matrix, or 
+// modify the existing one. For things like 
+// multiply matrix by constant, divide, transpose maybe
+// the header of the fn will show if it produeces a new
+// matrix or not
+
+// A nice simple copy
+// produces new matrix. 
+int
+matrix_copy
+(struct matrix **m_dp, struct matrix *A) {
+	matrix_zero_init(m_dp, A->rows, A->cols);
+
+	struct matrix *ret = *m_dp;
+	
+	for(int i = 0; i < A->rows; i++) {
+		for(int j = 0; j < A->cols; j++) {
+			ret->entries[i][j] = A->entries[i][j];
+		}
+	}
+	return 0;
+}
+
+
 int
 matrix_print(struct matrix *m_p) {
 	// print the elements with 2 decimal places.
@@ -128,13 +157,16 @@ int fill_matrix_01(struct matrix *m_p) {
 int main(void) {
 
 	struct matrix *m = NULL;
+	struct matrix *m2 = NULL;
 	matrix_zero_init(&m, 3, 4);
 	fill_matrix_01(m);
+	matrix_copy(&m2, m);
 	matrix_print(m);
+	
 	printf("\n");
-	matrix_add_row(m, 1, 2, 1);
+	//matrix_add_row(m, 1, 1, 1);
 //	matrix_mult_row(m, 2, -1);
 //	matrix_swap_rows(m, 1, 2);
-	matrix_print(m);
+	matrix_print(m2);
 	return 0;
 }
