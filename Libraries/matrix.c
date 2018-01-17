@@ -116,6 +116,26 @@ matrix_copy
 	return 0;
 }
 
+// Create a new matrix
+// that is the transpose of A. 
+int
+matrix_transpose
+(struct matrix **m_dp, struct matrix *A) {
+	matrix_zero_init(m_dp, A->cols, A->rows);
+	
+	struct matrix *ret = *m_dp;
+
+	for(int j = 0; j < A->cols; j++) {
+		for(int i = 0; i < A->rows; i++) {
+			ret->entries[j][i] = A->entries[i][j];
+		}
+	}
+	return 0;
+}
+
+
+
+
 
 int
 matrix_print(struct matrix *m_p) {
@@ -160,7 +180,7 @@ int main(void) {
 	struct matrix *m2 = NULL;
 	matrix_zero_init(&m, 3, 4);
 	fill_matrix_01(m);
-	matrix_copy(&m2, m);
+	matrix_transpose(&m2, m);
 	matrix_print(m);
 	
 	printf("\n");
