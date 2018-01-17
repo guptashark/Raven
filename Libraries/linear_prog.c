@@ -16,7 +16,11 @@ struct LP_matrix {
 	float **elements;
 };
 
-int matrix_init 
+int matrix_init(struct LP_matrix **lpm_dp);
+
+// row operations : add a multiple of another to a given row. 
+// row operations : swap two rows. 
+// row operations : swap two cols? 
 
 struct affine_fn {
 
