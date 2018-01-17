@@ -22,6 +22,8 @@ int matrix_init(struct LP_matrix **lpm_dp);
 // row operations : swap two rows. 
 // row operations : swap two cols? 
 
+stufffff
+
 struct affine_fn {
 
 	// an element of R^n
