@@ -1,2 +1,2 @@
 all:
-	gcc -Wall -Werror -Wextra -std=c99 linear_prog.c && ./a.out
+	gcc -Wall -Werror -Wextra -std=c99 matrix.c && ./a.out
