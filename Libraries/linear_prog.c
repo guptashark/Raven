@@ -5,6 +5,19 @@
 // the linear prog itself, in any sort of form (all acceptable) 
 // the linear prog in standard form, for computing with simplex. 
 
+// May need matrices... and row operations... 
+
+// might as well restrict the matrix for use in this file by namespacing it. c:w
+
+struct LP_matrix { 
+
+	int rows; 
+	int cols;
+	float **elements;
+};
+
+int matrix_init 
+
 struct affine_fn {
 
 	// an element of R^n
