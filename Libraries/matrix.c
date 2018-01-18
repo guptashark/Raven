@@ -133,9 +133,33 @@ matrix_transpose
 	return 0;
 }
 
+// create new matrix that is the 
+// progut of A and B. 
+// TODO Better error handling. Use assert? 
+int
+matrix_product
+(struct matrix **m_dp, struct matrix *A, struct matrix *B) {
+	// common enough of a potential error to report 
+	// if the dimensions mismatch. 
+	if(A->cols != B->rows) return 1;
 
+	matrix_zero_init(m_dp, A->rows, B->cols);
+	struct matrix *ret = *m_dp;
 
+	// now the actual multiplication... 
+	
+	for(int i = 0; i < A->rows; i++) {
+		for(int j = 0; j < B->cols; j++) {
+			for(int k = 0; k < A->cols; k++) {
+				float val = A->entries[i][k] * B->entries[k][j];
+				ret->entries[i][j] += val;
+			}
+		}
+	}
 
+	return 0;
+
+}
 
 int
 matrix_print(struct matrix *m_p) {
@@ -178,10 +202,12 @@ int main(void) {
 
 	struct matrix *m = NULL;
 	struct matrix *m2 = NULL;
+	struct matrix *m3 = NULL;
 	matrix_zero_init(&m, 3, 4);
 	fill_matrix_01(m);
 	matrix_transpose(&m2, m);
-	matrix_print(m);
+	matrix_product(&m3, m, m2);
+	matrix_print(m3);
 	
 	printf("\n");
 	//matrix_add_row(m, 1, 1, 1);
