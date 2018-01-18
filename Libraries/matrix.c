@@ -1,14 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct matrix {
-	
-	int rows;
-	int cols;
-
-	float **entries;
-	
-};
+#include "matrix.h"
 
 // The hard part of initializing these matrices... 
 // It is settled that each matrix *should* have its
@@ -159,6 +152,17 @@ matrix_product
 
 	return 0;
 
+}
+
+int 
+matrix_scalar_product
+(struct matrix *m_p, float k) {
+	for(int i = 0; i < m_p->rows; i++) {
+		for(int j = 0; j < m_p->cols; j++) {
+			m_p->entries[i][j] *= k;
+		}
+	}
+	return 0;
 }
 
 int
