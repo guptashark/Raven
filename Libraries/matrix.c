@@ -198,21 +198,47 @@ int fill_matrix_01(struct matrix *m_p) {
 	return 0;
 }
 
+int fill_row_vec_01(struct matrix *m_p) {
+
+	float data[3] = {2, 3, 4};
+
+	for(int i = 0; i < 1; i++) {
+		for(int j = 0; j < 3; j++) {
+			m_p->entries[i][j] = data[j];
+		}
+	}
+
+	return 0;
+}
+
+int fill_col_vec_01(struct matrix *m_p) {
+
+	float data[3] = {-3, 2, 9};
+
+	for(int i = 0; i < 3; i++) {
+		for(int j = 0; j < 1; j++) {
+			m_p->entries[i][j] = data[i];
+		}
+	}
+
+	return 0;
+}
+
+
 int main(void) {
 
-	struct matrix *m = NULL;
-	struct matrix *m2 = NULL;
-	struct matrix *m3 = NULL;
-	matrix_zero_init(&m, 3, 4);
-	fill_matrix_01(m);
-	matrix_transpose(&m2, m);
-	matrix_product(&m3, m, m2);
-	matrix_print(m3);
-	
-	printf("\n");
-	//matrix_add_row(m, 1, 1, 1);
-//	matrix_mult_row(m, 2, -1);
-//	matrix_swap_rows(m, 1, 2);
-	matrix_print(m2);
+	struct matrix *A;
+	matrix_zero_init(&A, 1, 3);
+
+	struct matrix *B;
+	matrix_zero_init(&B, 3, 1);
+
+	fill_row_vec_01(A);
+	fill_col_vec_01(B);
+
+	struct matrix *C;
+	matrix_product(&C, A, B);
+	matrix_print(C);
+
 	return 0;
 }
