@@ -1,4 +1,5 @@
-
+#include <stdio.h>
+#include <stdlib.h>
 // mimics the linked list that c++ provides, 
 // though without the back pointer. 
 
@@ -43,8 +44,8 @@ int l_node_set_prev
 struct linked_list {
 
 	int size;	
-	struct list_node *front;
-	struct list_node *back;
+	struct l_node *front;
+	struct l_node *back;
 };
 
 int ll_init
@@ -65,11 +66,12 @@ int ll_init
 
 	ret->size = 0;
 	*ll_dp = ret;
+	return 0;
 }
 
 int ll_push_back
 (struct linked_list *ll_p, void *item) {
-	
+
 	struct l_node *to_add = NULL;
 	l_node_init(&to_add, item);
 
@@ -86,7 +88,7 @@ int ll_push_back
 
 int ll_push_front
 (struct linked_list *ll_p, void *item) {
-	
+
 	struct l_node *to_add = NULL;
 	l_node_init(&to_add, item);
 	
@@ -94,7 +96,7 @@ int ll_push_front
 	l_node_set_prev(ll_p->front->next, to_add);
 
 	l_node_set_next(to_add, ll_p->front->next);
-	l_node_set_next(ll->front, to_add);
+	l_node_set_next(ll_p->front, to_add);
 
 	ll_p->size++;
 	return 0;
@@ -107,14 +109,14 @@ int ll_push_front
 int ll_print
 (struct linked_list *ll_p, void (*user_print)(void *)) {
 
-	struct current = ll_p->front->next;
+	struct l_node *current = ll_p->front->next;
 	for(int i = 0; i < ll_p->size; i++) {
 		user_print(current->item);
+		current = current->next;
 		printf("\t");
 	}
 	printf("\n");
 	return 0;
 }
 
-		
-
+	
