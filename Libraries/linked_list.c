@@ -1,21 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "linked_list.h"
 // mimics the linked list that c++ provides, 
 // though without the back pointer. 
-
-union list_data {
-	int i;
-	float f;
-	char c;
-	void *p;
-};
-
-struct l_node {
-	void *item;
-	struct l_node *next;
-	struct l_node *prev;
-};
-
 // hacky function names, but it fits for now.
 int l_node_init
 (struct l_node **ln_dp, void *item) {
@@ -40,13 +27,6 @@ int l_node_set_prev
 	ln_p->prev = prev;
 	return 0;
 }
-
-struct linked_list {
-
-	int size;	
-	struct l_node *front;
-	struct l_node *back;
-};
 
 int ll_init
 (struct linked_list **ll_dp) {
