@@ -1,9 +1,46 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// 
+struct lp_constraint {
+
+	struct linked_list *coeffs;
+	char *relation;
+	float rhs;
+};
+
+int
+lp_constraint_init(
+	struct lp_constraint **lpc_p, 
+	int coeffs_len, 
+	float *coeffs,
+	char *relation,
+	float rhs
+) {
+	struct lp_constraint *ret = NULL;
+	ret = malloc(sizeof(struct lp_constraint));
+
+	ll_init(&ret->coeffs);
+	// not the best soln... 
+	// but lets malloc each float... 
+	// and push the pointer to it in the linked_list
+
+
+	for(int i = 0; i < coeffs_len; i++) {
+		float *to_add = NULL;
+		to_add = malloc(sizeof(float));
+		*to_add = coeffs[i];
+		ll_push_back(ret->coeffs, to_add);
+	}
+}
+
 struct linear_program {
+	// all components of the objective fn. 
 	struct linked_list *c;
+	float obj_bias;
+	char *optimize_for;
+
+	// the constraints
+
 	// dont' know what really goes in here yet. 
 };
 
