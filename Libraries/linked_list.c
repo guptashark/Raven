@@ -99,4 +99,94 @@ int ll_print
 	return 0;
 }
 
+
+
+// *******************************
+// ITERATORS SECTION 
+// *******************************
+
+// functions to increment, decrement, deref, cmp
+
+int ll_bidir_iterator_increment(struct bidir_iterator *bi_p) {
 	
+	struct l_node *current = (struct l_node *)bi_p->data;
+	bi_p->data = current->next;
+	return 0;
+}
+
+int ll_bidir_iterator_decrement(struct bidir_iterator *bi_p) {
+	
+	struct l_node *current = (struct l_node *)bi_p->data;
+	bi_p->data = current->prev;
+	return 0;
+}
+
+int ll_bidir_iterator_deref
+(void **val_ptr, struct bidir_iterator *bi_p) { 
+
+	struct l_node *current = (struct l_node *)bi_p->data;
+	*val_ptr = data->item;
+	return 0;
+}
+
+int ll_bidir_iterator_cmp
+(bool *result, struct bidir_iterator *self, struct bidir_iterator *other) {
+	
+	// main idea is to do a raw comparison - 
+	// is the node we're at the node in other? 
+	struct l_node *current = (struct l_node *)self->data;
+	struct l_node *other_current = (struct l_node *)other->data;
+	if(current == other_current) {
+		*result = true;
+	} else {
+		*result = false;
+	}
+
+	return 0;
+}
+
+int 
+ll_begin(struct linked_list *ll_p, struct bidir_iterator **bi_p) {
+	// need to malloc... 
+	struct bidir_iterator *ret = NULL;
+	ret = malloc(sizeof(struct bidir_iterator));
+	ret->container = ll_p;
+	// fill in everything. 
+	
+	// set data to point at the first valid node. 
+	ret->data = ll_p->front->next;
+	ret->increment = ll_bidir_iterator_increment;
+	ret->decrement = ll_bidir_iterator_decrement;
+	ret->deref = ll_bidir_iterator_deref;
+	ret->cmp = ll_bidir_iterator_cmp;
+
+	*bi_p = ret;
+	return 0;
+}
+
+// realistically, this is a fair bit of reuse, 
+// it's best to have one function install all 
+// the functions, and then another to specifically
+// input the correct data.
+int
+ll_end(struct bidir_iterator *bi_p, struct bidir_iterator **bi_p) {
+	// install more things
+	// need to malloc... 
+	struct bidir_iterator *ret = NULL;
+	ret = malloc(sizeof(struct bidir_iterator));
+	ret->container = ll_p;
+	// fill in everything. 
+	
+	// set data to point at the first valid node. 
+	ret->data = ll_p->back;
+	ret->increment = ll_bidir_iterator_increment;
+	ret->decrement = ll_bidir_iterator_decrement;
+	ret->deref = ll_bidir_iterator_deref;
+	ret->cmp = ll_bidir_iterator_cmp;
+
+	*bi_p = ret;
+	return 0;
+
+}
+
+

@@ -2,14 +2,6 @@
 #include <stdlib.h>
 // mimics the linked list that c++ provides, 
 // though without the back pointer. 
-
-union list_data {
-	int i;
-	float f;
-	char c;
-	void *p;
-};
-
 struct l_node {
 	void *item;
 	struct l_node *next;
