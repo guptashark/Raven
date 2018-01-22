@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "linked_list.h"
 
 struct lp_constraint {
 
@@ -8,6 +9,7 @@ struct lp_constraint {
 	char relation[4];
 	float rhs;
 };
+
 
 int
 lp_constraint_init(
@@ -36,6 +38,29 @@ lp_constraint_init(
 	ret->rhs = rhs;
 
 	*lpc_p = ret;
+	return 0;
+}
+
+int
+lp_constraint_print(struct lp_constraint *lpc_p) {
+	struct bidir_iterator *i;
+	struct bidir_iterator *i_end;
+	ll_begin(lpc_p->coeffs, &i);
+	ll_end(lpc_p->coeffs, &i_end);
+
+	while(!(i->cmp(i, i_end))) {
+		void *val;
+		i->deref(i, &val);
+		printf("%.2f\t", *(float *)val);
+
+		i->increment(i);
+	}
+
+	// now print the relation operator
+	printf("%s\t", lpc_p->relation);
+	// now print the rhs
+	printf("%.2f", lpc_p->rhs);
+
 	return 0;
 }
 
@@ -73,8 +98,8 @@ int lp_init
 	
 	struct linear_program *ret = NULL;
 	ret = malloc(sizeof(struct linear_program));
-	ll_init(ret->c);
-	ll_init(ret->constraints);
+	ll_init(&(ret->c));
+	ll_init(&(ret->constraints));
 	*lp_dp = ret;
 	return 0;
 }
@@ -88,7 +113,7 @@ int lp_add_constraint(
 	int arr_len, 
 	float *coeffs, 
 	char *relation,
-	float *rhs) {
+	float rhs) {
 
 
 	struct lp_constraint *to_add= NULL;
@@ -109,11 +134,71 @@ int w_len,
 float *c,
 float bias,
 char *optimize_for) {
+	
+	// sigh... need to malloc all these floast
+	// grr	
 
-	// stuff
+	for(int i = 0; i < w_len; i++) {
+		float *to_add;
+		to_add = malloc(sizeof(float));
+		*to_add = c[i];
+		ll_push_back(lp_p->c, to_add);
+	}
+
+	// strcpy the max or min
+	strcpy(lp_p->optimize_for, optimize_for);
+
+	// copy the bias
+	lp_p->obj_bias = bias;
+	// and we're done. Phew. 
+	return 0;
 }
 
+// TODO STILL need to add in
+// the part of the linear prog that
+// records which vars have non neg constraints, et.c 
 
+int lp_print
+(struct linear_program *lp_p) {
+
+	// print the objective fn
+	struct bidir_iterator *i;
+	struct bidir_iterator *i_end;
+	ll_begin(lp_p->c, &i);
+	ll_end(lp_p->c, &i_end);
+
+	printf("%s (\t", lp_p->optimize_for);
+	while(!(i->cmp(i, i_end))) {
+		void *val;
+		i->deref(i, &val);
+		printf("%.2f\t ", *(float *)val);
+		i->increment(i);
+	}
+
+	printf(") \t+\t%.2f\n\n", lp_p->obj_bias);
+
+	// now to print the constraints;
+	// to do this, we need to destroy the iterators. 	
+
+	// TODO
+	// is this okay?? To just call free?? 
+	free(i);
+	free(i_end);
+
+	ll_begin(lp_p->constraints, &i);
+	ll_end(lp_p->constraints, &i_end);
+
+	while(!(i->cmp(i, i_end))) {
+		void *val;
+		i->deref(i, &val);
+		struct lp_constraint *r = NULL;
+		r = (struct lp_constraint *)val;
+		lp_constraint_print(r);
+		printf("\n");
+		i->increment(i);
+	}
+	return 0;
+}
 
 // standard equality form linear program
 // realistically, only linear program
@@ -125,5 +210,21 @@ struct sef_lp {
 
 int main(void) {
 
-	printf("Linear Program\n");
+	// we can do this with compund literals... 
+	// but lets just do it with named arrays	
+	struct linear_program *lp;
+	lp_init(&lp);
+
+	float c[3] = {1, 2, 1};
+	float coeff_1[2] = {3, 4};
+	float coeff_2[2] = {6, 7};
+	float coeff_3[2] = {2, 1};
+
+	lp_set_obj_fn(lp, 3, c, 9, "max");
+	lp_add_constraint(lp, 2, coeff_1, "<=", 5);
+	lp_add_constraint(lp, 2, coeff_2, ">=", 9);
+	lp_add_constraint(lp, 2, coeff_3, "==", 3);
+
+	lp_print(lp);
+	
 }
