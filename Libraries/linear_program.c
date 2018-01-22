@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct lp_constraint {
 
 	struct linked_list *coeffs;
-	char *relation;
+	char relation[4];
 	float rhs;
 };
 
@@ -24,22 +25,28 @@ lp_constraint_init(
 	// but lets malloc each float... 
 	// and push the pointer to it in the linked_list
 
-
 	for(int i = 0; i < coeffs_len; i++) {
 		float *to_add = NULL;
 		to_add = malloc(sizeof(float));
 		*to_add = coeffs[i];
 		ll_push_back(ret->coeffs, to_add);
 	}
+	
+	strcpy(ret->relation, relation);
+	ret->rhs = rhs;
+
+	*lpc_p = ret;
+	return 0;
 }
 
 struct linear_program {
 	// all components of the objective fn. 
 	struct linked_list *c;
 	float obj_bias;
-	char *optimize_for;
+	char optimize_for[4];
 
 	// the constraints
+	struct linked_list *constraints;
 
 	// dont' know what really goes in here yet. 
 };
@@ -63,21 +70,32 @@ struct linear_program {
 // init the linear program, that's it. 
 int lp_init
 (struct linear_program **lp_dp) {
-	//stuff 
+	
+	struct linear_program *ret = NULL;
+	ret = malloc(sizeof(struct linear_program));
+	ll_init(ret->c);
+	ll_init(ret->constraints);
+	*lp_dp = ret;
+	return 0;
 }
 
 // add in one equation: 
 // requires lhs, relation and rhs. 
 // equations are stored in the order they are put in. 
 // (0, 0, 3, 4) <=, 5, means: 3*x3 + 4*x4 <= 5 is the constraint. 
-int lp_add_constraint
-(struct linear_program *lp_p, 
-int arr_len, 
-float *coeffs, 
-char *relation,
-float *rhs) {
-		
+int lp_add_constraint(	
+	struct linear_program *lp_p, 
+	int arr_len, 
+	float *coeffs, 
+	char *relation,
+	float *rhs) {
 
+
+	struct lp_constraint *to_add= NULL;
+	lp_constraint_init(&to_add, arr_len, coeffs, relation, rhs);
+
+	ll_push_back(lp_p->constraints, to_add);
+	return 0;
 }
 
 // add in the objuctive fonctoin
