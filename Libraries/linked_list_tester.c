@@ -23,6 +23,22 @@ int main(void) {
 		ll_push_front(ll, &a[i]);
 	}
 	ll_print(ll, int_printer);
+	printf("\n Now with iterators\n");
+
+	struct bidir_iterator *i;
+	struct bidir_iterator *i_end;
+
+	ll_begin(ll, &i);
+	ll_end(ll, &i_end);
+	
+	while(!(i->cmp(i, i_end))) {
+		void *val;
+		i->deref(i, &val);
+		int *ip = (int *)val;
+		printf("%d\t", *ip);
+		i->increment(i);
+	}
+	printf("\n");
 
 	return 0;
 }

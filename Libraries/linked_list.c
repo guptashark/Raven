@@ -122,27 +122,25 @@ int ll_bidir_iterator_decrement(struct bidir_iterator *bi_p) {
 }
 
 int ll_bidir_iterator_deref
-(void **val_ptr, struct bidir_iterator *bi_p) { 
+(struct bidir_iterator *bi_p, void **val_ptr) { 
 
 	struct l_node *current = (struct l_node *)bi_p->data;
-	*val_ptr = data->item;
+	*val_ptr = current->item;
 	return 0;
 }
 
 int ll_bidir_iterator_cmp
-(bool *result, struct bidir_iterator *self, struct bidir_iterator *other) {
+(struct bidir_iterator *self, struct bidir_iterator *other) {
 	
 	// main idea is to do a raw comparison - 
 	// is the node we're at the node in other? 
 	struct l_node *current = (struct l_node *)self->data;
 	struct l_node *other_current = (struct l_node *)other->data;
 	if(current == other_current) {
-		*result = true;
+		return 1;
 	} else {
-		*result = false;
+		return 0;
 	}
-
-	return 0;
 }
 
 int 
@@ -169,7 +167,7 @@ ll_begin(struct linked_list *ll_p, struct bidir_iterator **bi_p) {
 // the functions, and then another to specifically
 // input the correct data.
 int
-ll_end(struct bidir_iterator *bi_p, struct bidir_iterator **bi_p) {
+ll_end(struct linked_list *ll_p, struct bidir_iterator **bi_p) {
 	// install more things
 	// need to malloc... 
 	struct bidir_iterator *ret = NULL;
@@ -186,7 +184,6 @@ ll_end(struct bidir_iterator *bi_p, struct bidir_iterator **bi_p) {
 
 	*bi_p = ret;
 	return 0;
-
 }
 
 

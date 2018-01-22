@@ -25,6 +25,6 @@ struct bidir_iterator {
 	int (*deref)(struct bidir_iterator *self, void **);
 
 	// same here, put result of cmp in bool * slot. 
-	int (*cmp)(bool *, struct bidir_iterator *self struct bidir_iterator *);
+	int (*cmp)(struct bidir_iterator *self, struct bidir_iterator *);
 
 };

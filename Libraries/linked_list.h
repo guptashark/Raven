@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "iterator.h"
 // mimics the linked list that c++ provides, 
 // though without the back pointer. 
 struct l_node {
@@ -43,4 +44,10 @@ int ll_print
 (struct linked_list *ll_p, void (*user_print)(void *));
 
 
+// FOR ITERATORS
+int 
+ll_begin(struct linked_list *ll_p, struct bidir_iterator **bi_p);
+
+int
+ll_end(struct linked_list *ll_p, struct bidir_iterator **bi_p);
 	
