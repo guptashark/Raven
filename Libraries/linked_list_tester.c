@@ -29,9 +29,8 @@ int main(void) {
 	struct bidir_iterator *i_end = ll_end(ll);
 
 	while(!(i->cmp(i, i_end))) {
-		void *val;
-		i->deref(i, &val);
-		printf("%d\t", *(int *)val);
+		int *val = i->deref(i);
+		printf("%d\t", *val);
 		i->increment(i);
 	}
 	printf("\n");

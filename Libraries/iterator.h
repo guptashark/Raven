@@ -22,7 +22,7 @@ struct bidir_iterator {
 	// to get the item... 
 	// put the item in the first arg slot. 
 	// (our "return" value) 
-	int (*deref)(struct bidir_iterator *self, void **);
+	void *(*deref)(struct bidir_iterator *);
 
 	// same here, put result of cmp in bool * slot. 
 	int (*cmp)(struct bidir_iterator *self, struct bidir_iterator *);

@@ -120,12 +120,12 @@ int ll_bidir_iterator_decrement(struct bidir_iterator *bi_p) {
 	return 0;
 }
 
-int ll_bidir_iterator_deref
-(struct bidir_iterator *bi_p, void **val_ptr) { 
+void *
+ll_bidir_iterator_deref
+(struct bidir_iterator *bi_p) { 
 
 	struct l_node *current = (struct l_node *)bi_p->data;
-	*val_ptr = current->item;
-	return 0;
+	return current->item;
 }
 
 int ll_bidir_iterator_cmp

@@ -50,9 +50,8 @@ lp_constraint_print(struct lp_constraint *lpc_p) {
 	i_end = ll_end(lpc_p->coeffs);
 
 	while(!(i->cmp(i, i_end))) {
-		void *val;
-		i->deref(i, &val);
-		printf("%.2f\t", *(float *)val);
+		float *f = i->deref(i);
+		printf("%.2f\t", *f);
 
 		i->increment(i);
 	}
@@ -172,9 +171,7 @@ int lp_invert_obj_fn
 	struct bidir_iterator *i_end = ll_end(lp_p->c);
 
 	while(!(i->cmp(i, i_end))) {
-		void *val;
-		i->deref(i, &val);	
-		float *f = (float *)val;
+		float *f = i->deref(i); 
 		*f = *f * -1;
 
 		i->increment(i);
@@ -219,9 +216,8 @@ int lp_print
 
 	printf("%s (\t", lp_p->optimize_for);
 	while(!(i->cmp(i, i_end))) {
-		void *val;
-		i->deref(i, &val);
-		printf("%.2f\t ", *(float *)val);
+		float *val = i->deref(i);
+		printf("%.2f\t ", *val);
 		i->increment(i);
 	}
 
@@ -239,10 +235,7 @@ int lp_print
 	i_end = ll_end(lp_p->constraints);
 
 	while(!(i->cmp(i, i_end))) {
-		void *val;
-		i->deref(i, &val);
-		struct lp_constraint *r = NULL;
-		r = (struct lp_constraint *)val;
+		struct lp_constraint *r = i->deref(i);
 		lp_constraint_print(r);
 		printf("\n");
 		i->increment(i);
@@ -259,9 +252,7 @@ int lp_print
 	int j = 1;
 
 	while(!(i->cmp(i, i_end))) { 
-		void *val;
-		i->deref(i, &val);
-		char *s = (char *)val;
+		char *s = i->deref(i);
 		// just print right now, 
 		// later on we can pretty print. 
 		int result = strcmp(s, "free");
