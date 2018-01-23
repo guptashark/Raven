@@ -27,8 +27,7 @@ struct linked_list {
 	struct l_node *back;
 };
 
-int ll_init
-(struct linked_list **ll_dp);
+struct linked_list *ll_init(void);
 
 int ll_push_back
 (struct linked_list *ll_p, void *item);

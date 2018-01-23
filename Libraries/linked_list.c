@@ -28,8 +28,8 @@ int l_node_set_prev
 	return 0;
 }
 
-int ll_init
-(struct linked_list **ll_dp) {
+struct linked_list *
+ll_init(void) {
 	struct linked_list *ret = NULL;
 	ret = malloc(sizeof(struct linked_list));
 	
@@ -45,8 +45,7 @@ int ll_init
 	l_node_set_prev(back, front);		
 
 	ret->size = 0;
-	*ll_dp = ret;
-	return 0;
+	return ret;
 }
 
 int ll_push_back

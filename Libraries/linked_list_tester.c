@@ -15,8 +15,7 @@ void ptr_printer(void *p) {
 int main(void) {
 	printf("ll tester\n");
 
-	struct linked_list *ll = NULL;
-	ll_init(&ll);
+	struct linked_list *ll = ll_init();
 
 	int a[4] = {3, 4, 2, 1};
 	for(int i = 0; i < 4; i ++) {
@@ -34,8 +33,7 @@ int main(void) {
 	while(!(i->cmp(i, i_end))) {
 		void *val;
 		i->deref(i, &val);
-		int *ip = (int *)val;
-		printf("%d\t", *ip);
+		printf("%d\t", *(int *)val);
 		i->increment(i);
 	}
 	printf("\n");

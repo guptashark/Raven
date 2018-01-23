@@ -22,7 +22,7 @@ lp_constraint_init(
 	struct lp_constraint *ret = NULL;
 	ret = malloc(sizeof(struct lp_constraint));
 
-	ll_init(&ret->coeffs);
+	ret->coeffs = ll_init();
 	// not the best soln... 
 	// but lets malloc each float... 
 	// and push the pointer to it in the linked_list
@@ -107,9 +107,9 @@ int lp_init
 	
 	struct linear_program *ret = NULL;
 	ret = malloc(sizeof(struct linear_program));
-	ll_init(&(ret->c));
-	ll_init(&(ret->constraints));
-	ll_init(&(ret->var_constraints));
+	ret->c = ll_init();
+	ret->constraints = ll_init();
+	ret->var_constraints = ll_init();
 	*lp_dp = ret;
 	return 0;
 }
