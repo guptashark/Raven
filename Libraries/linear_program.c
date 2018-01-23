@@ -6,7 +6,7 @@
 struct lp_constraint {
 
 	struct linked_list *coeffs;
-	char relation[4];
+	char relation[8];
 	float rhs;
 };
 
@@ -68,12 +68,21 @@ struct linear_program {
 	// all components of the objective fn. 
 	struct linked_list *c;
 	float obj_bias;
-	char optimize_for[4];
+	char optimize_for[8];
 
 	// the constraints
 	struct linked_list *constraints;
 
-	// dont' know what really goes in here yet. 
+	// variable constraints (bigger than 0, less, etc); 
+	// disclaimer: 
+	// The main way this works is that the variable
+	// constraint is a very simple one: free, >=, <= .
+	// otherwise, we've got a problem. If you want to 
+	// codify something more complicated, you have
+	// to add it as a general constraint. 
+	// rule - which is not hard. 
+	
+	struct linked_list *var_constraints;	
 };
 
 // initialize a linear program: 
@@ -100,6 +109,7 @@ int lp_init
 	ret = malloc(sizeof(struct linear_program));
 	ll_init(&(ret->c));
 	ll_init(&(ret->constraints));
+	ll_init(&(ret->var_constraints));
 	*lp_dp = ret;
 	return 0;
 }
@@ -154,9 +164,26 @@ char *optimize_for) {
 	return 0;
 }
 
+
+
 // TODO STILL need to add in
 // the part of the linear prog that
 // records which vars have non neg constraints, et.c 
+
+// long function name, but pretty descriptive, no? 
+// (rel_to_zero means relation to zero, free, >= or <=.
+int lp_add_variable_constraint
+(struct linear_program *lp_p, char *rel_to_zero ) {
+	// malloc an 8 byte string, 
+	// add it onto the list.
+	char *to_add = NULL;
+	to_add = malloc(sizeof(char) * 8);
+	
+	strcpy(to_add, rel_to_zero);
+	ll_push_back(lp_p->var_constraints, to_add);
+	return 0;
+}
+
 
 int lp_print
 (struct linear_program *lp_p) {
@@ -197,8 +224,41 @@ int lp_print
 		printf("\n");
 		i->increment(i);
 	}
+
+	// Now add in the variable constraints. 
+
+	free(i);
+	free(i_end);
+	
+	ll_begin(lp_p->var_constraints, &i);
+	ll_end(lp_p->var_constraints, &i_end);
+	
+	int j = 1;
+
+	while(!(i->cmp(i, i_end))) { 
+		void *val;
+		i->deref(i, &val);
+		char *s = (char *)val;
+		// just print right now, 
+		// later on we can pretty print. 
+		int result = strcmp(s, "free");
+		if(result) {
+
+			printf("x_%d %s 0, ", j, s);
+		} else {
+			printf("x_%d free, ", j);
+		}
+		
+		i->increment(i);
+		j++;
+
+	}
+
+	printf("\n");
 	return 0;
 }
+
+
 
 // standard equality form linear program
 // realistically, only linear program
@@ -225,6 +285,13 @@ int main(void) {
 	lp_add_constraint(lp, 2, coeff_2, ">=", 9);
 	lp_add_constraint(lp, 2, coeff_3, "==", 3);
 
+	lp_add_variable_constraint(lp, ">=");
+	lp_add_variable_constraint(lp, "<=");
+	lp_add_variable_constraint(lp, "free");
+//	lp_add_variable_constraint(lp, ">=");
+	
+
 	lp_print(lp);
+	return 0;
 	
 }
