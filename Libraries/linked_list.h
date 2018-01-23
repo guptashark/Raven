@@ -27,7 +27,8 @@ struct linked_list {
 	struct l_node *back;
 };
 
-struct linked_list *ll_init(void);
+struct linked_list *
+ll_init(void);
 
 int ll_push_back
 (struct linked_list *ll_p, void *item);
@@ -44,9 +45,9 @@ int ll_print
 
 
 // FOR ITERATORS
-int 
-ll_begin(struct linked_list *ll_p, struct bidir_iterator **bi_p);
+struct bidir_iterator *
+ll_begin(struct linked_list *ll_p);
 
-int
-ll_end(struct linked_list *ll_p, struct bidir_iterator **bi_p);
+struct bidir_iterator *
+ll_end(struct linked_list *ll_p);
 	

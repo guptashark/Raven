@@ -142,8 +142,8 @@ int ll_bidir_iterator_cmp
 	}
 }
 
-int 
-ll_begin(struct linked_list *ll_p, struct bidir_iterator **bi_p) {
+struct bidir_iterator *
+ll_begin(struct linked_list *ll_p) {
 	// need to malloc... 
 	struct bidir_iterator *ret = NULL;
 	ret = malloc(sizeof(struct bidir_iterator));
@@ -157,16 +157,15 @@ ll_begin(struct linked_list *ll_p, struct bidir_iterator **bi_p) {
 	ret->deref = ll_bidir_iterator_deref;
 	ret->cmp = ll_bidir_iterator_cmp;
 
-	*bi_p = ret;
-	return 0;
+	return ret;
 }
 
 // realistically, this is a fair bit of reuse, 
 // it's best to have one function install all 
 // the functions, and then another to specifically
 // input the correct data.
-int
-ll_end(struct linked_list *ll_p, struct bidir_iterator **bi_p) {
+struct bidir_iterator *
+ll_end(struct linked_list *ll_p) {
 	// install more things
 	// need to malloc... 
 	struct bidir_iterator *ret = NULL;
@@ -181,8 +180,7 @@ ll_end(struct linked_list *ll_p, struct bidir_iterator **bi_p) {
 	ret->deref = ll_bidir_iterator_deref;
 	ret->cmp = ll_bidir_iterator_cmp;
 
-	*bi_p = ret;
-	return 0;
+	return ret;
 }
 
 

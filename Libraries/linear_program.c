@@ -45,8 +45,9 @@ int
 lp_constraint_print(struct lp_constraint *lpc_p) {
 	struct bidir_iterator *i;
 	struct bidir_iterator *i_end;
-	ll_begin(lpc_p->coeffs, &i);
-	ll_end(lpc_p->coeffs, &i_end);
+
+	i = ll_begin(lpc_p->coeffs);
+	i_end = ll_end(lpc_p->coeffs);
 
 	while(!(i->cmp(i, i_end))) {
 		void *val;
@@ -167,10 +168,8 @@ char *optimize_for) {
 int lp_invert_obj_fn
 (struct linear_program *lp_p) {
 
-	struct bidir_iterator *i;
-	struct bidir_iterator *i_end;
-	ll_begin(lp_p->c, &i);
-	ll_end(lp_p->c, &i_end);
+	struct bidir_iterator *i = ll_begin(lp_p->c);
+	struct bidir_iterator *i_end = ll_end(lp_p->c);
 
 	while(!(i->cmp(i, i_end))) {
 		void *val;
@@ -215,10 +214,8 @@ int lp_print
 (struct linear_program *lp_p) {
 
 	// print the objective fn
-	struct bidir_iterator *i;
-	struct bidir_iterator *i_end;
-	ll_begin(lp_p->c, &i);
-	ll_end(lp_p->c, &i_end);
+	struct bidir_iterator *i = ll_begin(lp_p->c);
+	struct bidir_iterator *i_end = ll_end(lp_p->c);
 
 	printf("%s (\t", lp_p->optimize_for);
 	while(!(i->cmp(i, i_end))) {
@@ -238,8 +235,8 @@ int lp_print
 	free(i);
 	free(i_end);
 
-	ll_begin(lp_p->constraints, &i);
-	ll_end(lp_p->constraints, &i_end);
+	i = ll_begin(lp_p->constraints);
+	i_end = ll_end(lp_p->constraints);
 
 	while(!(i->cmp(i, i_end))) {
 		void *val;
@@ -256,8 +253,8 @@ int lp_print
 	free(i);
 	free(i_end);
 	
-	ll_begin(lp_p->var_constraints, &i);
-	ll_end(lp_p->var_constraints, &i_end);
+	i = ll_begin(lp_p->var_constraints);
+	i_end = ll_end(lp_p->var_constraints);
 	
 	int j = 1;
 
