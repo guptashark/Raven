@@ -25,13 +25,13 @@ int main(void) {
 	ll_print(ll, int_printer);
 	printf("\n Now with iterators\n");
 
-	struct bidir_iterator *i = ll_begin(ll);
-	struct bidir_iterator *i_end = ll_end(ll);
+	Iterator i = ll_begin(ll);
+	Iterator i_end = ll_end(ll);
 
 	while(!(i->cmp(i, i_end))) {
-		int *val = i->deref(i);
+		int *val = iter_deref(i);
 		printf("%d\t", *val);
-		i->increment(i);
+		iter_increment(i);
 	}
 	printf("\n");
 

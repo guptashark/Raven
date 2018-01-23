@@ -106,14 +106,14 @@ int ll_print
 
 // functions to increment, decrement, deref, cmp
 
-int ll_bidir_iterator_increment(struct bidir_iterator *bi_p) {
+int ll_bidir_iterator_increment(Iterator bi_p) {
 	
 	struct l_node *current = (struct l_node *)bi_p->data;
 	bi_p->data = current->next;
 	return 0;
 }
 
-int ll_bidir_iterator_decrement(struct bidir_iterator *bi_p) {
+int ll_bidir_iterator_decrement(Iterator bi_p) {
 	
 	struct l_node *current = (struct l_node *)bi_p->data;
 	bi_p->data = current->prev;
@@ -122,14 +122,14 @@ int ll_bidir_iterator_decrement(struct bidir_iterator *bi_p) {
 
 void *
 ll_bidir_iterator_deref
-(struct bidir_iterator *bi_p) { 
+(Iterator bi_p) { 
 
 	struct l_node *current = (struct l_node *)bi_p->data;
 	return current->item;
 }
 
 int ll_bidir_iterator_cmp
-(struct bidir_iterator *self, struct bidir_iterator *other) {
+(Iterator self, Iterator other) {
 	
 	// main idea is to do a raw comparison - 
 	// is the node we're at the node in other? 
@@ -142,11 +142,11 @@ int ll_bidir_iterator_cmp
 	}
 }
 
-struct bidir_iterator *
+Iterator
 ll_begin(struct linked_list *ll_p) {
 	// need to malloc... 
-	struct bidir_iterator *ret = NULL;
-	ret = malloc(sizeof(struct bidir_iterator));
+	Iterator ret = NULL;
+	ret = malloc(sizeof(struct iterator));
 	ret->container = ll_p;
 	// fill in everything. 
 	
@@ -164,12 +164,12 @@ ll_begin(struct linked_list *ll_p) {
 // it's best to have one function install all 
 // the functions, and then another to specifically
 // input the correct data.
-struct bidir_iterator *
+Iterator
 ll_end(struct linked_list *ll_p) {
 	// install more things
 	// need to malloc... 
-	struct bidir_iterator *ret = NULL;
-	ret = malloc(sizeof(struct bidir_iterator));
+	Iterator ret = NULL;
+	ret = malloc(sizeof(struct iterator));
 	ret->container = ll_p;
 	// fill in everything. 
 	

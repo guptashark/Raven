@@ -1,5 +1,8 @@
 #include <stdbool.h>
 
+
+struct iterator;
+typedef struct iterator *Iterator;
 // bidirectional iterator
 // 
 struct iterator {
@@ -14,18 +17,18 @@ struct iterator {
 	void *data;
 
 	// to make iterator move along container. 	
-	int (*increment)(struct bidir_iterator *self);
+	int (*increment)(Iterator self);
 
 	// to make iterator move backwards. 
-	int (*decrement)(struct bidir_iterator *self);
+	int (*decrement)(Iterator self);
 
 	// to get the item... 
 	// put the item in the first arg slot. 
 	// (our "return" value) 
-	void *(*deref)(struct bidir_iterator *);
+	void *(*deref)(Iterator);
 
 	// same here, put result of cmp in bool * slot. 
-	int (*cmp)(struct bidir_iterator *self, struct bidir_iterator *);
+	int (*cmp)(Iterator self, Iterator);
 
 };
 
@@ -40,16 +43,16 @@ struct iterator {
 // decrement, etc. Doesn't look fully like c++, 
 // but it is a lot nicer than something like: 
 
-// struct iterator *i = ll_begin(my_list);
+// Iterator *i = ll_begin(my_list);
 // i->increment(i); 
 
 // when instead we can have: 
 // iter_increment(i);
 
-int iter_increment(struct iterator *);
+void iter_increment(Iterator);
 
-int iter_decrement(struct iterator *);
+void iter_decrement(Iterator);
 
-void *iter_deref(struct iterator *);
+void *iter_deref(Iterator);
 
 

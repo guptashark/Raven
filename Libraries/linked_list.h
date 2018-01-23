@@ -45,9 +45,9 @@ int ll_print
 
 
 // FOR ITERATORS
-struct bidir_iterator *
+Iterator
 ll_begin(struct linked_list *ll_p);
 
-struct bidir_iterator *
+Iterator 
 ll_end(struct linked_list *ll_p);
 	

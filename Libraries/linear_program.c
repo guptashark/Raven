@@ -43,8 +43,8 @@ lp_constraint_init(
 
 int
 lp_constraint_print(struct lp_constraint *lpc_p) {
-	struct bidir_iterator *i;
-	struct bidir_iterator *i_end;
+	Iterator i;
+	Iterator i_end;
 
 	i = ll_begin(lpc_p->coeffs);
 	i_end = ll_end(lpc_p->coeffs);
@@ -167,8 +167,8 @@ char *optimize_for) {
 int lp_invert_obj_fn
 (struct linear_program *lp_p) {
 
-	struct bidir_iterator *i = ll_begin(lp_p->c);
-	struct bidir_iterator *i_end = ll_end(lp_p->c);
+	Iterator i = ll_begin(lp_p->c);
+	Iterator i_end = ll_end(lp_p->c);
 
 	while(!(i->cmp(i, i_end))) {
 		float *f = i->deref(i); 
@@ -211,14 +211,14 @@ int lp_print
 (struct linear_program *lp_p) {
 
 	// print the objective fn
-	struct bidir_iterator *i = ll_begin(lp_p->c);
-	struct bidir_iterator *i_end = ll_end(lp_p->c);
+	Iterator i = ll_begin(lp_p->c);
+	Iterator i_end = ll_end(lp_p->c);
 
 	printf("%s (\t", lp_p->optimize_for);
 	while(!(i->cmp(i, i_end))) {
-		float *val = i->deref(i);
+		float *val = iter_deref(i);
 		printf("%.2f\t ", *val);
-		i->increment(i);
+		iter_increment(i);
 	}
 
 	printf(") \t+\t%.2f\n\n", lp_p->obj_bias);
@@ -235,10 +235,10 @@ int lp_print
 	i_end = ll_end(lp_p->constraints);
 
 	while(!(i->cmp(i, i_end))) {
-		struct lp_constraint *r = i->deref(i);
+		struct lp_constraint *r = iter_deref(i);
 		lp_constraint_print(r);
 		printf("\n");
-		i->increment(i);
+		iter_increment(i);
 	}
 
 	// Now add in the variable constraints. 
@@ -252,7 +252,7 @@ int lp_print
 	int j = 1;
 
 	while(!(i->cmp(i, i_end))) { 
-		char *s = i->deref(i);
+		char *s = iter_deref(i);
 		// just print right now, 
 		// later on we can pretty print. 
 		int result = strcmp(s, "free");
@@ -263,7 +263,7 @@ int lp_print
 			printf("x_%d free, ", j);
 		}
 		
-		i->increment(i);
+		iter_increment(i);
 		j++;
 
 	}
