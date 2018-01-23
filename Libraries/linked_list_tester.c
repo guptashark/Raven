@@ -24,15 +24,29 @@ int main(void) {
 	
 	ll_print(ll, int_printer);
 	printf("\n Now with iterators\n");
-
+/*
 	Iterator i = ll_begin(ll);
-	Iterator i_end = ll_end(ll);
 
-	while(!(i->cmp(i, i_end))) {
+	while(!(i->cmp(i, ll_end(ll)))) {
 		int *val = iter_deref(i);
 		printf("%d\t", *val);
 		iter_increment(i);
 	}
+*/
+	Iterator i;	
+
+	for(
+		i = ll_begin(ll);
+		!iter_cmp(i, ll_end(ll));
+		iter_increment(i)
+	) {
+		printf("%d\t", *(int *)iter_deref(i));
+	}	
+	
+	iter_destroy(i);
+
+	ll_destroy(ll);
+
 	printf("\n");
 
 	return 0;

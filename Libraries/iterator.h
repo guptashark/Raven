@@ -55,4 +55,8 @@ void iter_decrement(Iterator);
 
 void *iter_deref(Iterator);
 
+int iter_cmp(Iterator, Iterator);
+
+void iter_destroy(Iterator);
+
 

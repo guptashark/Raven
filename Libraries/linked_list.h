@@ -13,7 +13,6 @@ struct l_node {
 int l_node_init
 (struct l_node **ln_dp, void *item);
 
-
 int l_node_set_next
 (struct l_node *ln_p, struct l_node *next);
 
@@ -25,6 +24,10 @@ struct linked_list {
 	int size;	
 	struct l_node *front;
 	struct l_node *back;
+
+	// the end iterator for 
+	// checking in while loops
+	Iterator end;
 };
 
 struct linked_list *
@@ -43,6 +46,8 @@ int ll_push_front
 int ll_print
 (struct linked_list *ll_p, void (*user_print)(void *));
 
+void ll_destroy(struct linked_list *);
+void ll_destroy_all(struct linked_list *);
 
 // FOR ITERATORS
 Iterator
