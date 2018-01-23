@@ -164,7 +164,33 @@ char *optimize_for) {
 	return 0;
 }
 
+int lp_invert_obj_fn
+(struct linear_program *lp_p) {
 
+	struct bidir_iterator *i;
+	struct bidir_iterator *i_end;
+	ll_begin(lp_p->c, &i);
+	ll_end(lp_p->c, &i_end);
+
+	while(!(i->cmp(i, i_end))) {
+		void *val;
+		i->deref(i, &val);	
+		float *f = (float *)val;
+		*f = *f * -1;
+
+		i->increment(i);
+	}
+	
+	int result = strcmp(lp_p->optimize_for, "max");
+	if(result) {
+		strcpy(lp_p->optimize_for, "max");
+	} else {
+		strcpy(lp_p->optimize_for, "min");
+	}
+
+	return 0;
+
+}
 
 // TODO STILL need to add in
 // the part of the linear prog that
@@ -291,6 +317,13 @@ int main(void) {
 //	lp_add_variable_constraint(lp, ">=");
 	
 
+	lp_print(lp);
+	printf("\n");
+
+	lp_invert_obj_fn(lp);
+	lp_print(lp);
+	lp_invert_obj_fn(lp);
+	printf("\n");
 	lp_print(lp);
 	return 0;
 	
