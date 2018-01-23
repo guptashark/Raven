@@ -2,7 +2,7 @@
 
 // bidirectional iterator
 // 
-struct bidir_iterator {
+struct iterator {
 
 	// the container we're iterating along. 
 	void *container;
@@ -28,3 +28,28 @@ struct bidir_iterator {
 	int (*cmp)(struct bidir_iterator *self, struct bidir_iterator *);
 
 };
+
+// Notes: 
+
+// wether an iterator is bidirectional, forward, etc
+// seem to be defined elsewhere - not in the type. 
+// otherwise, we'd be stuck with a lot of types... 
+// it's better to instead create iter functions
+// that act on iterators themselves, which 
+// end up calling that internal function to increment, 
+// decrement, etc. Doesn't look fully like c++, 
+// but it is a lot nicer than something like: 
+
+// struct iterator *i = ll_begin(my_list);
+// i->increment(i); 
+
+// when instead we can have: 
+// iter_increment(i);
+
+int iter_increment(struct iterator *);
+
+int iter_decrement(struct iterator *);
+
+void *iter_deref(struct iterator *);
+
+
