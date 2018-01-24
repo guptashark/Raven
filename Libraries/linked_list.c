@@ -42,9 +42,9 @@ int list_iterator_cmp
 	struct l_node *current = (struct l_node *)self->data;
 	struct l_node *other_current = (struct l_node *)other->data;
 	if(current == other_current) {
-		return 1;
-	} else {
 		return 0;
+	} else {
+		return 1;
 	}
 }
 
@@ -137,7 +137,7 @@ list_ctor_copy(List source) {
 	Iterator i;
 	for(
 		i = list_begin(source);
-		!iter_cmp(i, list_end(source));
+		iter_neq(i, list_end(source));
 		iter_increment(i)
 	) {
 		list_push_back(ret, iter_deref(i));

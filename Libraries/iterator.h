@@ -57,6 +57,9 @@ void *iter_deref(Iterator);
 
 int iter_cmp(Iterator, Iterator);
 
+int iter_neq(Iterator, Iterator);
+
+int iter_eq(Iterator, Iterator);
 void iter_destroy(Iterator);
 
 

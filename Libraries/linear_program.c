@@ -49,7 +49,7 @@ lp_constraint_print(struct lp_constraint *lpc_p) {
 	i = list_begin(lpc_p->coeffs);
 	i_end = list_end(lpc_p->coeffs);
 
-	while(!(i->cmp(i, i_end))) {
+	while(iter_neq(i, i_end)) {
 		float *f = i->deref(i);
 		printf("%.2f\t", *f);
 
@@ -125,7 +125,6 @@ int lp_add_constraint(
 	char *relation,
 	float rhs) {
 
-
 	struct lp_constraint *to_add= NULL;
 	lp_constraint_init(&to_add, arr_len, coeffs, relation, rhs);
 
@@ -170,7 +169,7 @@ int lp_invert_obj_fn
 	Iterator i = list_begin(lp_p->c);
 	Iterator i_end = list_end(lp_p->c);
 
-	while(!(iter_cmp(i, i_end))) {
+	while(iter_neq(i, i_end)) {
 		float *f = iter_deref(i); 
 		*f = *f * -1;
 
@@ -207,6 +206,55 @@ int lp_add_variable_constraint
 }
 
 
+// Need to be able to convert a constraint
+// that is an inequality into an equality
+// by adding in the corresponding slack 
+// variable. 
+
+int lp_add_slack_vars(struct linear_program *lp) {
+
+	Iterator i;
+	for(
+		i = list_begin(lp->constraints);
+		iter_neq(i, list_end(lp->constraints));
+		iter_increment(i)
+	) {
+		struct lp_constraint *curr= iter_deref(i);
+		if(strcmp(curr->relation, "==") != 0) {
+			float to_set = 0;
+			if(strcmp(curr->relation, ">=") == 0) {
+				to_set = -1;
+			} else {
+				to_set = 1;
+			}
+
+			// if the constraint is >= 0... 
+			// append a zero to all the constraints - 
+			// except this one. 
+			Iterator j;
+			for(
+				j = list_begin(lp->constraints);
+				iter_neq(j, list_end(lp->constraints));
+				iter_increment(j)
+			) {
+				struct lp_constraint *to_extend = iter_deref(j);
+				float *to_add = malloc(sizeof(float));
+
+				// set correct val to push back
+				if(iter_eq(i, j)) {
+					*to_add = to_set;
+				} else {
+					*to_add = 0;
+				}
+
+				list_push_back(to_extend->coeffs, to_add);
+			}
+		}
+	}
+
+	return 0;
+}
+
 int lp_print
 (struct linear_program *lp_p) {
 
@@ -215,7 +263,7 @@ int lp_print
 	Iterator i_end = list_end(lp_p->c);
 
 	printf("%s (\t", lp_p->optimize_for);
-	while(!(i->cmp(i, i_end))) {
+	while(iter_neq(i, i_end)) {
 		float *val = iter_deref(i);
 		printf("%.2f\t ", *val);
 		iter_increment(i);
@@ -234,7 +282,7 @@ int lp_print
 	i = list_begin(lp_p->constraints);
 	i_end = list_end(lp_p->constraints);
 
-	while(!(i->cmp(i, i_end))) {
+	while(iter_neq(i, i_end)) {
 		struct lp_constraint *r = iter_deref(i);
 		lp_constraint_print(r);
 		printf("\n");
@@ -307,7 +355,8 @@ int main(void) {
 	lp_print(lp);
 	printf("\n");
 
-	lp_invert_obj_fn(lp);
+//	lp_invert_obj_fn(lp);
+	lp_add_slack_vars(lp);
 	lp_print(lp);
 	return 0;
 	

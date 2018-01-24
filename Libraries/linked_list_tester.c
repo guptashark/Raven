@@ -37,7 +37,7 @@ int main(void) {
 
 	for(
 		i = list_begin(ll);
-		!iter_cmp(i, list_end(ll));
+		iter_neq(i, list_end(ll));
 		iter_increment(i)
 	) {
 		printf("%d\t", *(int *)iter_deref(i));
