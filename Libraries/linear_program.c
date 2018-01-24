@@ -274,6 +274,9 @@ int lp_regularize_vars(struct linear_program *lp) {
 	// same time. 
 
 	List listof_iters = list_ctor_empty();
+	// put in the iterator from the obj function: 
+	Iterator obj_iter = list_begin(lp->c);
+	list_push_back(listof_iters, obj_iter);
 
 	Iterator i;
 
@@ -304,7 +307,9 @@ int lp_regularize_vars(struct linear_program *lp) {
 		// we don't yet have the insert function... 
 		char *s = iter_deref(k);
 		bool less_than_zero = (strcmp(s, "<=") == 0);
-		
+		bool is_free = (strcmp(s, "free") == 0);
+		(void)is_free;	
+			
 		for(
 			i = list_begin(listof_iters);
 			iter_neq(i, list_end(listof_iters));
@@ -317,9 +322,15 @@ int lp_regularize_vars(struct linear_program *lp) {
 
 				float *val = iter_deref(ptr);
 				*val = *val * -1;
-			} else {
-				iter_increment(ptr);
+			} else if(is_free) {
+				float *val = iter_deref(ptr);
+				float *to_insert = malloc(sizeof(float));
+				*to_insert = *val;
+				*val = *val * -1;
+				list_insert(ptr->container, ptr, to_insert);
 			}
+				
+			iter_increment(ptr);
 		}
 
 		strcpy(s, ">=");
@@ -413,14 +424,14 @@ int main(void) {
 	lp_init(&lp);
 
 	float c[3] = {1, 2, 1};
-	float coeff_1[2] = {3, 4};
-	float coeff_2[2] = {6, 7};
-	float coeff_3[2] = {2, 1};
+	float coeff_1[3] = {3, 4, -3};
+	float coeff_2[3] = {6, 7, 19};
+	float coeff_3[3] = {2, 1, 8};
 
 	lp_set_obj_fn(lp, 3, c, 9, "max");
-	lp_add_constraint(lp, 2, coeff_1, "<=", 5);
-	lp_add_constraint(lp, 2, coeff_2, ">=", 9);
-	lp_add_constraint(lp, 2, coeff_3, "==", 3);
+	lp_add_constraint(lp, 3, coeff_1, "<=", 5);
+	lp_add_constraint(lp, 3, coeff_2, ">=", 9);
+	lp_add_constraint(lp, 3, coeff_3, "==", 3);
 
 	lp_add_variable_constraint(lp, ">=");
 	lp_add_variable_constraint(lp, "<=");
@@ -433,6 +444,7 @@ int main(void) {
 
 //	lp_invert_obj_fn(lp);
 	lp_regularize_vars(lp);
+	lp_add_slack_vars(lp);
 	lp_print(lp);
 	return 0;
 	
