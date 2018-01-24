@@ -22,7 +22,7 @@ lp_constraint_init(
 	struct lp_constraint *ret = NULL;
 	ret = malloc(sizeof(struct lp_constraint));
 
-	ret->coeffs = ll_init();
+	ret->coeffs = ll_ctor_empty();
 	// not the best soln... 
 	// but lets malloc each float... 
 	// and push the pointer to it in the linked_list
@@ -107,9 +107,9 @@ int lp_init
 	
 	struct linear_program *ret = NULL;
 	ret = malloc(sizeof(struct linear_program));
-	ret->c = ll_init();
-	ret->constraints = ll_init();
-	ret->var_constraints = ll_init();
+	ret->c = ll_ctor_empty();
+	ret->constraints = ll_ctor_empty();
+	ret->var_constraints = ll_ctor_empty();
 	*lp_dp = ret;
 	return 0;
 }
@@ -169,14 +169,19 @@ int lp_invert_obj_fn
 
 	Iterator i = ll_begin(lp_p->c);
 	Iterator i_end = ll_end(lp_p->c);
+	printf("%p, %p \n", i->data, i_end->data);
 
-	while(!(i->cmp(i, i_end))) {
-		float *f = i->deref(i); 
+	printf("A\n");
+	while(!(iter_cmp(i, i_end))) {
+		printf("IN LOOP\n");
+		float *f = iter_deref(i); 
 		*f = *f * -1;
+		printf("%f yeaa ", *f);
 
-		i->increment(i);
+		iter_increment(i);
 	}
-	
+
+	printf("B\n");	
 	int result = strcmp(lp_p->optimize_for, "max");
 	if(result) {
 		strcpy(lp_p->optimize_for, "max");
@@ -229,7 +234,7 @@ int lp_print
 	// TODO
 	// is this okay?? To just call free?? 
 	free(i);
-	free(i_end);
+	// The culprit - can't free this lol
 
 	i = ll_begin(lp_p->constraints);
 	i_end = ll_end(lp_p->constraints);
@@ -244,7 +249,6 @@ int lp_print
 	// Now add in the variable constraints. 
 
 	free(i);
-	free(i_end);
 	
 	i = ll_begin(lp_p->var_constraints);
 	i_end = ll_end(lp_p->var_constraints);
@@ -309,9 +313,6 @@ int main(void) {
 	printf("\n");
 
 	lp_invert_obj_fn(lp);
-	lp_print(lp);
-	lp_invert_obj_fn(lp);
-	printf("\n");
 	lp_print(lp);
 	return 0;
 	

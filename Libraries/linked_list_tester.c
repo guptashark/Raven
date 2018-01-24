@@ -15,7 +15,7 @@ void ptr_printer(void *p) {
 int main(void) {
 	printf("ll tester\n");
 
-	struct linked_list *ll = ll_init();
+	struct linked_list *ll = ll_ctor_empty();
 
 	int a[4] = {3, 4, 2, 1};
 	for(int i = 0; i < 4; i ++) {

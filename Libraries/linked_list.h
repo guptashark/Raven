@@ -31,7 +31,7 @@ struct linked_list {
 };
 
 struct linked_list *
-ll_init(void);
+ll_ctor_empty(void);
 
 int ll_push_back
 (struct linked_list *ll_p, void *item);

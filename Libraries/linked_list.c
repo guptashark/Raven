@@ -77,7 +77,7 @@ int l_node_set_prev
 }
 
 struct linked_list *
-ll_init(void) {
+ll_ctor_empty(void) {
 	struct linked_list *ret = NULL;
 	ret = malloc(sizeof(struct linked_list));
 	
