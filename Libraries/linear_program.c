@@ -10,7 +10,6 @@ struct lp_constraint {
 	float rhs;
 };
 
-
 int
 lp_constraint_init(
 	struct lp_constraint **lpc_p, 
@@ -231,6 +230,7 @@ int lp_add_slack_vars(struct linear_program *lp) {
 			// if the constraint is >= 0... 
 			// append a zero to all the constraints - 
 			// except this one. 
+			// also, push a zero in the objective fn. 
 			Iterator j;
 			for(
 				j = list_begin(lp->constraints);
@@ -249,6 +249,15 @@ int lp_add_slack_vars(struct linear_program *lp) {
 
 				list_push_back(to_extend->coeffs, to_add);
 			}
+			
+			// set the new relation
+			strcpy(curr->relation, "==");
+			
+			// push back on the obj fn to make room 
+			// for the new value. 
+			float *obj_to_add = malloc(sizeof(float));
+			*obj_to_add = 0;
+			list_push_back(lp->c, obj_to_add);
 		}
 	}
 
@@ -298,7 +307,7 @@ int lp_print
 	
 	int j = 1;
 
-	while(!(i->cmp(i, i_end))) { 
+	while(iter_neq(i, i_end)) { 
 		char *s = iter_deref(i);
 		// just print right now, 
 		// later on we can pretty print. 
