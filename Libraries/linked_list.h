@@ -45,6 +45,11 @@ int list_push_back
 int list_push_front
 (List, void *item);
 
+
+Iterator 
+list_insert(List, Iterator, void *);
+	
+
 // for debugging: 
 // the function argument is one that is user supplied - 
 // since the data is void pointers, and list does not 

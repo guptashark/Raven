@@ -264,6 +264,49 @@ int lp_add_slack_vars(struct linear_program *lp) {
 	return 0;
 }
 
+// fix problems like: x2 <= 0 
+// and things like: x5 is free
+/*
+int lp_regularize_vars(struct linear_program *lp) {
+
+	// first make the list of iterators. one for each 
+	// constraint, so we can iterate them all at the 
+	// same time. 
+
+	struct linked_list *listof_iters;
+	listof_iters = list_ctor_empty();
+
+	Iterator i;
+
+	for(
+		i = list_begin(lp->constraints);
+		iter_neq(i, list_end(lp->constraints));
+		iter_increment(i)
+	) {
+
+		struct lp_constraint *current = iter_deref(i);
+
+		Iterator j = list_begin(current->coeffs);
+		list_push_back(listof_iters, j);
+
+	}
+	iter_destroy(i);
+
+	// now that we have the list of constraints
+	// for every single constraint... lol 
+
+	// iterator along the variables
+	Iterator k; 
+
+	
+	for(k = list_begin(lp->var_constraints); 
+		iter_neq(k, list_end(lp->var_constraints)); 
+		iter_increment(k))
+	{
+		// we don't yet have the insert function... 
+
+}
+*/
 int lp_print
 (struct linear_program *lp_p) {
 

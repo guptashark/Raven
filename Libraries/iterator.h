@@ -1,5 +1,7 @@
 #include <stdbool.h>
 
+// TODO
+// Implement getters and setters
 
 struct iterator;
 typedef struct iterator *Iterator;

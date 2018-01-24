@@ -42,11 +42,28 @@ int main(void) {
 	) {
 		printf("%d\t", *(int *)iter_deref(i));
 	}	
-	
+
+	iter_destroy(i);
+	i = list_begin(ll);
+	iter_increment(i);
+	iter_increment(i);
+
+	printf("\n");
+	printf("got here 1\n");
+	int x = 13;
+	(void)x;
+	list_insert(ll, i, &x);
+
+	printf("got here\n");	
 	iter_destroy(i);
 
-	List l2 = list_ctor_copy(ll);
-	list_print(l2, int_printer);
+	for(
+		i = list_begin(ll);
+		iter_neq(i, list_end(ll));
+		iter_increment(i)
+	) {
+		printf("%d\t", *(int *)iter_deref(i));
+	}
 
 	list_destroy(ll);
 

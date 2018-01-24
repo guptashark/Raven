@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include "linked_list.h"
 
-
-
 // *******************************
 // ITERATORS SECTION 
 // *******************************
@@ -195,6 +193,28 @@ int list_print
 	}
 	printf("\n");
 	return 0;
+}
+
+Iterator 
+list_insert(List lst, Iterator i, void *item) {
+
+	// now this should work	
+	struct l_node *current = i->data;
+	struct l_node *to_add = NULL;
+	to_add = malloc(sizeof(struct l_node));
+	l_node_init(&to_add, item);
+
+	l_node_set_next(to_add, current);
+	l_node_set_prev(to_add, current->prev);
+
+	l_node_set_next(current->prev, to_add);
+	l_node_set_prev(current, to_add);
+
+	// this is a hack, probably best 
+	// to have a *real* iterator ctor lol
+	Iterator ret = list_end_init(lst);
+	ret->data = current->prev->item;
+	return ret;
 }
 
 void list_destroy
