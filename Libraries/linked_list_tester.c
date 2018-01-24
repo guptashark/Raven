@@ -45,6 +45,9 @@ int main(void) {
 	
 	iter_destroy(i);
 
+	struct linked_list *l2 = ll_ctor_copy(ll);
+	ll_print(l2, int_printer);
+
 	ll_destroy(ll);
 
 	printf("\n");

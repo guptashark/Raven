@@ -33,6 +33,9 @@ struct linked_list {
 struct linked_list *
 ll_ctor_empty(void);
 
+struct linked_list *
+ll_ctor_copy(struct linked_list *);
+
 int ll_push_back
 (struct linked_list *ll_p, void *item);
 

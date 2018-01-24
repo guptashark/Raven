@@ -107,6 +107,47 @@ ll_ctor_empty(void) {
 	return ret;
 }
 
+struct linked_list *
+ll_ctor_copy(struct linked_list *source) {
+	struct linked_list *ret = NULL;
+	ret = malloc(sizeof(struct linked_list));
+	
+	struct l_node *front = NULL;
+	struct l_node *back = NULL;
+	l_node_init(&front, NULL);
+	l_node_init(&back, NULL);
+	
+	ret->front = front;
+	ret->back = back;
+	
+	l_node_set_next(front, back);
+	l_node_set_prev(back, front);
+	ret->size = 0;
+//
+	//now, copy over all the elements from source. 
+	Iterator i;
+	for(
+		i = ll_begin(source);
+		!iter_cmp(i, ll_end(source));
+		iter_increment(i)
+	) {
+		ll_push_back(ret, iter_deref(i));
+	}
+
+
+	// set up the end iterator	
+	ret->end = malloc(sizeof(struct iterator));
+	ret->end->container = ret;
+	ret->end->data = ret->back;
+	ret->end->increment = ll_iterator_increment;
+	ret->end->decrement = ll_iterator_decrement;
+	ret->end->deref = ll_iterator_deref;
+	ret->end->cmp = ll_iterator_cmp;
+
+	return ret;
+
+}
+
 int ll_push_back
 (struct linked_list *ll_p, void *item) {
 
