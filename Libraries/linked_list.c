@@ -12,29 +12,29 @@
 // might as well define these here so that the list
 // init function can use them. 
 
-int ll_iterator_increment(Iterator bi_p) {
+int list_iterator_increment(Iterator i) {
 	
-	struct l_node *current = (struct l_node *)bi_p->data;
-	bi_p->data = current->next;
+	struct l_node *current = (struct l_node *)i->data;
+	i->data = current->next;
 	return 0;
 }
 
-int ll_iterator_decrement(Iterator bi_p) {
+int list_iterator_decrement(Iterator i) {
 	
-	struct l_node *current = (struct l_node *)bi_p->data;
-	bi_p->data = current->prev;
+	struct l_node *current = (struct l_node *)i->data;
+	i->data = current->prev;
 	return 0;
 }
 
 void *
-ll_iterator_deref
-(Iterator bi_p) { 
+list_iterator_deref
+(Iterator i) { 
 
-	struct l_node *current = (struct l_node *)bi_p->data;
+	struct l_node *current = (struct l_node *)i->data;
 	return current->item;
 }
 
-int ll_iterator_cmp
+int list_iterator_cmp
 (Iterator self, Iterator other) {
 	
 	// main idea is to do a raw comparison - 
@@ -77,25 +77,25 @@ int l_node_set_prev
 }
 
 Iterator 
-ll_end_init(struct linked_list *lst) {
+list_end_init(List lst) {
 
 	struct iterator *ret = NULL;
 	ret = malloc(sizeof(struct iterator));
 	ret->container = lst;
 	ret->data = lst->back;
-	ret->increment = ll_iterator_increment;
-	ret->decrement = ll_iterator_decrement;
-	ret->deref = ll_iterator_deref;
-	ret->cmp = ll_iterator_cmp;
+	ret->increment = list_iterator_increment;
+	ret->decrement = list_iterator_decrement;
+	ret->deref = list_iterator_deref;
+	ret->cmp = list_iterator_cmp;
 
 	return ret;
 
 }
 
-struct linked_list *
-ll_ctor_empty(void) {
-	struct linked_list *ret = NULL;
-	ret = malloc(sizeof(struct linked_list));
+List 
+list_ctor_empty(void) {
+	List ret = NULL;
+	ret = malloc(sizeof(struct list));
 	
 	struct l_node *front = NULL;
 	struct l_node *back = NULL;
@@ -110,16 +110,16 @@ ll_ctor_empty(void) {
 
 	ret->size = 0;
 
-	Iterator end = ll_end_init(ret);
+	Iterator end = list_end_init(ret);
 	ret->end = end;
 
 	return ret;
 }
 
-struct linked_list *
-ll_ctor_copy(struct linked_list *source) {
-	struct linked_list *ret = NULL;
-	ret = malloc(sizeof(struct linked_list));
+List 
+list_ctor_copy(List source) {
+	List ret = NULL;
+	ret = malloc(sizeof(struct list));
 	
 	struct l_node *front = NULL;
 	struct l_node *back = NULL;
@@ -136,47 +136,47 @@ ll_ctor_copy(struct linked_list *source) {
 	//now, copy over all the elements from source. 
 	Iterator i;
 	for(
-		i = ll_begin(source);
-		!iter_cmp(i, ll_end(source));
+		i = list_begin(source);
+		!iter_cmp(i, list_end(source));
 		iter_increment(i)
 	) {
-		ll_push_back(ret, iter_deref(i));
+		list_push_back(ret, iter_deref(i));
 	}
-	Iterator end = ll_end_init(ret);
+	Iterator end = list_end_init(ret);
 	ret->end = end;
 	return ret;
 }
 
-int ll_push_back
-(struct linked_list *ll_p, void *item) {
+int list_push_back
+(List lst, void *item) {
 
 	struct l_node *to_add = NULL;
 	l_node_init(&to_add, item);
 
-	l_node_set_next(to_add, ll_p->back);
-	l_node_set_next(ll_p->back->prev, to_add);
+	l_node_set_next(to_add, lst->back);
+	l_node_set_next(lst->back->prev, to_add);
 
-	l_node_set_prev(to_add, ll_p->back->prev);
-	l_node_set_prev(ll_p->back, to_add);
+	l_node_set_prev(to_add, lst->back->prev);
+	l_node_set_prev(lst->back, to_add);
 
-	ll_p->size++;
+	lst->size++;
 
 	return 0;
 }
 
-int ll_push_front
-(struct linked_list *ll_p, void *item) {
+int list_push_front
+(List lst, void *item) {
 
 	struct l_node *to_add = NULL;
 	l_node_init(&to_add, item);
 	
-	l_node_set_prev(to_add, ll_p->front);
-	l_node_set_prev(ll_p->front->next, to_add);
+	l_node_set_prev(to_add, lst->front);
+	l_node_set_prev(lst->front->next, to_add);
 
-	l_node_set_next(to_add, ll_p->front->next);
-	l_node_set_next(ll_p->front, to_add);
+	l_node_set_next(to_add, lst->front->next);
+	l_node_set_next(lst->front, to_add);
 
-	ll_p->size++;
+	lst->size++;
 	return 0;
 }
 
@@ -184,11 +184,11 @@ int ll_push_front
 // the function argument is one that is user supplied - 
 // since the data is void pointers, and ll does not 
 // know how to print it.
-int ll_print
-(struct linked_list *ll_p, void (*user_print)(void *)) {
+int list_print
+(List lst, void (*user_print)(void *)) {
 
-	struct l_node *current = ll_p->front->next;
-	for(int i = 0; i < ll_p->size; i++) {
+	struct l_node *current = lst->front->next;
+	for(int i = 0; i < lst->size; i++) {
 		user_print(current->item);
 		current = current->next;
 		printf("\t");
@@ -197,8 +197,8 @@ int ll_print
 	return 0;
 }
 
-void ll_destroy
-(struct linked_list *lst) {
+void list_destroy
+(List lst) {
 	struct l_node *current = lst->front;
 	struct l_node *next = current->next;
 
@@ -214,8 +214,8 @@ void ll_destroy
 	free(lst);
 }
 
-void ll_destroy_all
-(struct linked_list *lst) {
+void list_destroy_all
+(List lst) {
 	struct l_node *current = lst->front;
 	struct l_node *next = current->next;
 	
@@ -231,19 +231,19 @@ void ll_destroy_all
 }
 
 Iterator
-ll_begin(struct linked_list *ll_p) {
+list_begin(List lst) {
 	// need to malloc... 
 	Iterator ret = NULL;
 	ret = malloc(sizeof(struct iterator));
-	ret->container = ll_p;
+	ret->container = lst;
 	// fill in everything. 
 	
 	// set data to point at the first valid node. 
-	ret->data = ll_p->front->next;
-	ret->increment = ll_iterator_increment;
-	ret->decrement = ll_iterator_decrement;
-	ret->deref = ll_iterator_deref;
-	ret->cmp = ll_iterator_cmp;
+	ret->data = lst->front->next;
+	ret->increment = list_iterator_increment;
+	ret->decrement = list_iterator_decrement;
+	ret->deref = list_iterator_deref;
+	ret->cmp = list_iterator_cmp;
 
 	return ret;
 }
@@ -253,24 +253,24 @@ ll_begin(struct linked_list *ll_p) {
 // except when doing random things like reverse, 
 // and whatnot. 
 Iterator
-ll_end(struct linked_list *ll_p) {
+list_end(List lst) {
 	/* 
 	// install more things
 	// need to malloc... 
 	Iterator ret = NULL;
 	ret = malloc(sizeof(struct iterator));
-	ret->container = ll_p;
+	ret->container = lst;
 	// fill in everything. 
 	
 	// set data to point at the first valid node. 
-	ret->data = ll_p->back;
-	ret->increment = ll_iterator_increment;
-	ret->decrement = ll_iterator_decrement;
-	ret->deref = ll_iterator_deref;
-	ret->cmp = ll_iterator_cmp;
+	ret->data = lst->back;
+	ret->increment = list_iterator_increment;
+	ret->decrement = list_iterator_decrement;
+	ret->deref = list_iterator_deref;
+	ret->cmp = list_iterator_cmp;
 	*/
 
-	return ll_p->end;
+	return lst->end;
 }
 
 

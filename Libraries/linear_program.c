@@ -5,7 +5,7 @@
 
 struct lp_constraint {
 
-	struct linked_list *coeffs;
+	List coeffs;
 	char relation[8];
 	float rhs;
 };
@@ -22,7 +22,7 @@ lp_constraint_init(
 	struct lp_constraint *ret = NULL;
 	ret = malloc(sizeof(struct lp_constraint));
 
-	ret->coeffs = ll_ctor_empty();
+	ret->coeffs = list_ctor_empty();
 	// not the best soln... 
 	// but lets malloc each float... 
 	// and push the pointer to it in the linked_list
@@ -31,7 +31,7 @@ lp_constraint_init(
 		float *to_add = NULL;
 		to_add = malloc(sizeof(float));
 		*to_add = coeffs[i];
-		ll_push_back(ret->coeffs, to_add);
+		list_push_back(ret->coeffs, to_add);
 	}
 	
 	strcpy(ret->relation, relation);
@@ -46,8 +46,8 @@ lp_constraint_print(struct lp_constraint *lpc_p) {
 	Iterator i;
 	Iterator i_end;
 
-	i = ll_begin(lpc_p->coeffs);
-	i_end = ll_end(lpc_p->coeffs);
+	i = list_begin(lpc_p->coeffs);
+	i_end = list_end(lpc_p->coeffs);
 
 	while(!(i->cmp(i, i_end))) {
 		float *f = i->deref(i);
@@ -66,12 +66,12 @@ lp_constraint_print(struct lp_constraint *lpc_p) {
 
 struct linear_program {
 	// all components of the objective fn. 
-	struct linked_list *c;
+	List c;
 	float obj_bias;
 	char optimize_for[8];
 
 	// the constraints
-	struct linked_list *constraints;
+	List constraints;
 
 	// variable constraints (bigger than 0, less, etc); 
 	// disclaimer: 
@@ -82,7 +82,7 @@ struct linear_program {
 	// to add it as a general constraint. 
 	// rule - which is not hard. 
 	
-	struct linked_list *var_constraints;	
+	List var_constraints;	
 };
 
 // initialize a linear program: 
@@ -107,9 +107,9 @@ int lp_init
 	
 	struct linear_program *ret = NULL;
 	ret = malloc(sizeof(struct linear_program));
-	ret->c = ll_ctor_empty();
-	ret->constraints = ll_ctor_empty();
-	ret->var_constraints = ll_ctor_empty();
+	ret->c = list_ctor_empty();
+	ret->constraints = list_ctor_empty();
+	ret->var_constraints = list_ctor_empty();
 	*lp_dp = ret;
 	return 0;
 }
@@ -129,7 +129,7 @@ int lp_add_constraint(
 	struct lp_constraint *to_add= NULL;
 	lp_constraint_init(&to_add, arr_len, coeffs, relation, rhs);
 
-	ll_push_back(lp_p->constraints, to_add);
+	list_push_back(lp_p->constraints, to_add);
 	return 0;
 }
 
@@ -152,7 +152,7 @@ char *optimize_for) {
 		float *to_add;
 		to_add = malloc(sizeof(float));
 		*to_add = c[i];
-		ll_push_back(lp_p->c, to_add);
+		list_push_back(lp_p->c, to_add);
 	}
 
 	// strcpy the max or min
@@ -167,8 +167,8 @@ char *optimize_for) {
 int lp_invert_obj_fn
 (struct linear_program *lp_p) {
 
-	Iterator i = ll_begin(lp_p->c);
-	Iterator i_end = ll_end(lp_p->c);
+	Iterator i = list_begin(lp_p->c);
+	Iterator i_end = list_end(lp_p->c);
 
 	while(!(iter_cmp(i, i_end))) {
 		float *f = iter_deref(i); 
@@ -202,7 +202,7 @@ int lp_add_variable_constraint
 	to_add = malloc(sizeof(char) * 8);
 	
 	strcpy(to_add, rel_to_zero);
-	ll_push_back(lp_p->var_constraints, to_add);
+	list_push_back(lp_p->var_constraints, to_add);
 	return 0;
 }
 
@@ -211,8 +211,8 @@ int lp_print
 (struct linear_program *lp_p) {
 
 	// print the objective fn
-	Iterator i = ll_begin(lp_p->c);
-	Iterator i_end = ll_end(lp_p->c);
+	Iterator i = list_begin(lp_p->c);
+	Iterator i_end = list_end(lp_p->c);
 
 	printf("%s (\t", lp_p->optimize_for);
 	while(!(i->cmp(i, i_end))) {
@@ -231,8 +231,8 @@ int lp_print
 	free(i);
 	// The culprit - can't free this lol
 
-	i = ll_begin(lp_p->constraints);
-	i_end = ll_end(lp_p->constraints);
+	i = list_begin(lp_p->constraints);
+	i_end = list_end(lp_p->constraints);
 
 	while(!(i->cmp(i, i_end))) {
 		struct lp_constraint *r = iter_deref(i);
@@ -245,8 +245,8 @@ int lp_print
 
 	free(i);
 	
-	i = ll_begin(lp_p->var_constraints);
-	i_end = ll_end(lp_p->var_constraints);
+	i = list_begin(lp_p->var_constraints);
+	i_end = list_end(lp_p->var_constraints);
 	
 	int j = 1;
 

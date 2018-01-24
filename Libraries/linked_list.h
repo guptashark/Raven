@@ -18,8 +18,11 @@ int l_node_set_next
 
 int l_node_set_prev
 (struct l_node *ln_p, struct l_node *prev);
+
+struct list;
+typedef struct list *List;
 	
-struct linked_list {
+struct list {
 
 	int size;	
 	struct l_node *front;
@@ -30,32 +33,31 @@ struct linked_list {
 	Iterator end;
 };
 
-struct linked_list *
-ll_ctor_empty(void);
+List 
+list_ctor_empty(void);
 
-struct linked_list *
-ll_ctor_copy(struct linked_list *);
+List 
+list_ctor_copy(List);
 
-int ll_push_back
-(struct linked_list *ll_p, void *item);
+int list_push_back
+(List, void *item);
 
-int ll_push_front
-(struct linked_list *ll_p, void *item);
+int list_push_front
+(List, void *item);
 
 // for debugging: 
 // the function argument is one that is user supplied - 
-// since the data is void pointers, and ll does not 
+// since the data is void pointers, and list does not 
 // know how to print it.
-int ll_print
-(struct linked_list *ll_p, void (*user_print)(void *));
+int list_print
+(List lst, void (*user_print)(void *));
 
-void ll_destroy(struct linked_list *);
-void ll_destroy_all(struct linked_list *);
+void list_destroy(List);
+//
+// TODO Do we need this? 
+void list_destroy_all(List);
 
 // FOR ITERATORS
-Iterator
-ll_begin(struct linked_list *ll_p);
-
-Iterator 
-ll_end(struct linked_list *ll_p);
+Iterator list_begin(List);
+Iterator list_end(List);
 	
