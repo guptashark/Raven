@@ -76,6 +76,22 @@ int l_node_set_prev
 	return 0;
 }
 
+Iterator 
+ll_end_init(struct linked_list *lst) {
+
+	struct iterator *ret = NULL;
+	ret = malloc(sizeof(struct iterator));
+	ret->container = lst;
+	ret->data = lst->back;
+	ret->increment = ll_iterator_increment;
+	ret->decrement = ll_iterator_decrement;
+	ret->deref = ll_iterator_deref;
+	ret->cmp = ll_iterator_cmp;
+
+	return ret;
+
+}
+
 struct linked_list *
 ll_ctor_empty(void) {
 	struct linked_list *ret = NULL;
@@ -94,15 +110,8 @@ ll_ctor_empty(void) {
 
 	ret->size = 0;
 
-
-	// set up the end iterator	
-	ret->end = malloc(sizeof(struct iterator));
-	ret->end->container = ret;
-	ret->end->data = ret->back;
-	ret->end->increment = ll_iterator_increment;
-	ret->end->decrement = ll_iterator_decrement;
-	ret->end->deref = ll_iterator_deref;
-	ret->end->cmp = ll_iterator_cmp;
+	Iterator end = ll_end_init(ret);
+	ret->end = end;
 
 	return ret;
 }
@@ -133,19 +142,9 @@ ll_ctor_copy(struct linked_list *source) {
 	) {
 		ll_push_back(ret, iter_deref(i));
 	}
-
-
-	// set up the end iterator	
-	ret->end = malloc(sizeof(struct iterator));
-	ret->end->container = ret;
-	ret->end->data = ret->back;
-	ret->end->increment = ll_iterator_increment;
-	ret->end->decrement = ll_iterator_decrement;
-	ret->end->deref = ll_iterator_deref;
-	ret->end->cmp = ll_iterator_cmp;
-
+	Iterator end = ll_end_init(ret);
+	ret->end = end;
 	return ret;
-
 }
 
 int ll_push_back

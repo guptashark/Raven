@@ -169,19 +169,14 @@ int lp_invert_obj_fn
 
 	Iterator i = ll_begin(lp_p->c);
 	Iterator i_end = ll_end(lp_p->c);
-	printf("%p, %p \n", i->data, i_end->data);
 
-	printf("A\n");
 	while(!(iter_cmp(i, i_end))) {
-		printf("IN LOOP\n");
 		float *f = iter_deref(i); 
 		*f = *f * -1;
-		printf("%f yeaa ", *f);
 
 		iter_increment(i);
 	}
 
-	printf("B\n");	
 	int result = strcmp(lp_p->optimize_for, "max");
 	if(result) {
 		strcpy(lp_p->optimize_for, "max");
