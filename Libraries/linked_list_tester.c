@@ -49,7 +49,6 @@ int main(void) {
 	iter_increment(i);
 
 	printf("\n");
-	printf("got here 1\n");
 	int x = 13;
 	(void)x;
 	list_insert(ll, i, &x);

@@ -266,15 +266,14 @@ int lp_add_slack_vars(struct linear_program *lp) {
 
 // fix problems like: x2 <= 0 
 // and things like: x5 is free
-/*
+
 int lp_regularize_vars(struct linear_program *lp) {
 
 	// first make the list of iterators. one for each 
 	// constraint, so we can iterate them all at the 
 	// same time. 
 
-	struct linked_list *listof_iters;
-	listof_iters = list_ctor_empty();
+	List listof_iters = list_ctor_empty();
 
 	Iterator i;
 
@@ -292,21 +291,46 @@ int lp_regularize_vars(struct linear_program *lp) {
 	}
 	iter_destroy(i);
 
-	// now that we have the list of constraints
+	// now that we have the list of iters of constraints
 	// for every single constraint... lol 
 
 	// iterator along the variables
-	Iterator k; 
-
+	Iterator k;
 	
 	for(k = list_begin(lp->var_constraints); 
 		iter_neq(k, list_end(lp->var_constraints)); 
 		iter_increment(k))
 	{
 		// we don't yet have the insert function... 
+		char *s = iter_deref(k);
+		bool less_than_zero = (strcmp(s, "<=") == 0);
+		
+		for(
+			i = list_begin(listof_iters);
+			iter_neq(i, list_end(listof_iters));
+			iter_increment(i)
+		) {
 
+			Iterator ptr = iter_deref(i);	
+
+			if(less_than_zero) {
+
+				float *val = iter_deref(ptr);
+				*val = *val * -1;
+			} else {
+				iter_increment(ptr);
+			}
+		}
+
+		strcpy(s, ">=");
+
+	}
+
+		
+				
+	return 0;
 }
-*/
+
 int lp_print
 (struct linear_program *lp_p) {
 
@@ -408,7 +432,7 @@ int main(void) {
 	printf("\n");
 
 //	lp_invert_obj_fn(lp);
-	lp_add_slack_vars(lp);
+	lp_regularize_vars(lp);
 	lp_print(lp);
 	return 0;
 	
