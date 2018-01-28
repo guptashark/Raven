@@ -41,6 +41,11 @@ int
 matrix_scalar_product
 (struct matrix *m_p, float k);
 
+// we need more functions to be like this, improve readability
+struct matrix *
+matrix_inverse(struct matrix *A);
+
+
 int
 matrix_print(struct matrix *m_p);
 

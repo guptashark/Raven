@@ -63,6 +63,27 @@ lp_constraint_print(struct lp_constraint *lpc_p) {
 	return 0;
 }
 
+
+// Main problem: 
+// We need to record which variables are where, 
+// in terms of variable names. How do we keep 
+// track? Especially with sorting and such, 
+// moving columns around, etc. 
+
+// 2 solutions: 
+//	* add the variable name to var_constraints
+//	* make a new list for the var constraints. 
+// 
+// Second way feels best because then when we
+// pass it on to the standard equality form 
+// it won't have the extra useless data from 
+// var_constraints. Also, when sef meses up the 
+// columns, we can fix them because we'll know 
+// of the original order. 
+
+// It's getting common enough that we should
+// implement an ascii string library, 
+// similar to the c++ string library. 
 struct linear_program {
 	// all components of the objective fn. 
 	List c;
@@ -78,10 +99,11 @@ struct linear_program {
 	// constraint is a very simple one: free, >=, <= .
 	// otherwise, we've got a problem. If you want to 
 	// codify something more complicated, you have
-	// to add it as a general constraint. 
-	// rule - which is not hard. 
+	// to add it as a general constraint 
+	// - which is not hard. 
 	
-	List var_constraints;	
+	List var_constraints;
+	List var_names;
 };
 
 // initialize a linear program: 
@@ -407,34 +429,33 @@ int lp_print
 }
 
 
-
-// standard equality form linear program
-// realistically, only linear program
-// should be making this. 
-struct sef_lp {
-	
-};
-
-
 int main(void) {
+
+	// Need a bit of a procedure for initializing
+	// linear programs: Must always write the 
+	// objective function first. 
+	// then all the constraints. 
+	// then convert to a SEF linearprog. 
+	
+		
 
 	// we can do this with compund literals... 
 	// but lets just do it with named arrays	
 	struct linear_program *lp;
 	lp_init(&lp);
 
-	float c[3] = {1, 2, 1};
-	float coeff_1[3] = {3, 4, -3};
-	float coeff_2[3] = {6, 7, 19};
-	float coeff_3[3] = {2, 1, 8};
+	float c[3] = {-1, 2, -4};
+	float coeff_1[3] = {1, 5, 3};
+	float coeff_2[3] = {2, -1, 2};
+	float coeff_3[3] = {1, 2, -1};
 
-	lp_set_obj_fn(lp, 3, c, 9, "max");
-	lp_add_constraint(lp, 3, coeff_1, "<=", 5);
-	lp_add_constraint(lp, 3, coeff_2, ">=", 9);
-	lp_add_constraint(lp, 3, coeff_3, "==", 3);
+	lp_set_obj_fn(lp, 3, c, 9, "min");
+	lp_add_constraint(lp, 3, coeff_1, ">=", 5);
+	lp_add_constraint(lp, 3, coeff_2, "<=", 4);
+	lp_add_constraint(lp, 3, coeff_3, "==", 2);
 
 	lp_add_variable_constraint(lp, ">=");
-	lp_add_variable_constraint(lp, "<=");
+	lp_add_variable_constraint(lp, ">=");
 	lp_add_variable_constraint(lp, "free");
 //	lp_add_variable_constraint(lp, ">=");
 	
@@ -442,7 +463,7 @@ int main(void) {
 	lp_print(lp);
 	printf("\n");
 
-//	lp_invert_obj_fn(lp);
+	lp_invert_obj_fn(lp);
 	lp_regularize_vars(lp);
 	lp_add_slack_vars(lp);
 	lp_print(lp);

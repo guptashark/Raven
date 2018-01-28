@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "matrix.h"
-
 // The hard part of initializing these matrices... 
 // It is settled that each matrix *should* have its
 // own copies of the entries. 
@@ -30,7 +29,6 @@ matrix_zero_init
 
 	*m_dp = ret;
 	return 0;
-
 }
 
 // swap two rows, given their indices. 
@@ -163,6 +161,24 @@ matrix_scalar_product
 		}
 	}
 	return 0;
+}
+
+// currently only works for 2x2 matrices!! 
+struct matrix *
+matrix_inverse(struct matrix *A) {
+	struct matrix *inv = NULL;
+	matrix_zero_init(&inv, 2, 2);
+	inv->entries[0][0] = A->entries[1][1];
+	inv->entries[1][1] = A->entries[0][0];
+	inv->entries[1][0] = -1 * A->entries[0][1];
+	inv->entires[0][1] = -1 * A->entries[1][0];
+
+	float ad = A->entries[0][0] * A->entries[1][1];
+	float bc = A->entries[0][1] * A->entries[1][0];
+	
+	matrix_scalar_product(inv, 1 / (ad - bc));
+		
+	return inv;
 }
 
 int
