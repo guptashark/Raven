@@ -70,6 +70,7 @@ string_ctor_literal(char *s) {
 
 	ret->size = len;
 	ret->capacity = len + 16;
+	ret->data = malloc(sizeof(char) * ret->capacity);
 
 	for(int i = 0; i < ret->size; i++) {
 		ret->data[i] = s[i];
@@ -77,5 +78,44 @@ string_ctor_literal(char *s) {
 
 	return ret;
 }
+
+String
+string_ctor_buff(char *b, int n) {
+
+	String ret = malloc(sizeof(struct string));
+
+	ret->size = n;
+	ret->capacity = n + 16;
+
+	ret->data = malloc(sizeof(char) * ret->capacity);
+
+	for(int i = 0; i < ret->size; i++) {
+		ret->data[i] = b[i];
+	}
+
+	return ret;
+}
+
+String
+string_ctor_fill(int n, char c) { 
+
+	String ret = malloc(sizeof(struct string));
+
+	ret->size = n;
+	ret->capacity = n + 16;
+
+	ret->data = malloc(sizeof(char) * ret->capacity);
+
+	for(int i = 0; i < ret->size; i++) {
+		ret->data[i] = c;
+	}
+
+	return ret;
+
+}
+
+// TODO
+// Implement the iterator constructor along with iterators. 
+
 
 
