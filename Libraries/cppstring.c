@@ -132,6 +132,29 @@ string_assign_literal(String dest, char *s) {
 	}
 }
 
+void
+string_assign_str(String dest, String source) {
+	int len = string_length(source);
+
+	if(len > string_capacity(dest)) {
+		free(dest->data);
+		dest->capacity = len + 32;
+		dest->data = malloc(sizeof(char) * dest->capacity);
+	}
+
+	for(int i = 0; i < len; i++) {
+		dest->data[i] = source[i];
+	}
+}
+
+void
+string_assign_char(String dest, char c) {
+
+	dest->size = 1;
+	dest->data[0] = c;
+}
+
+
 int 
 string_size(String s) {
 	return s->size;
