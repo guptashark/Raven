@@ -117,5 +117,32 @@ string_ctor_fill(int n, char c) {
 // TODO
 // Implement the iterator constructor along with iterators. 
 
+void
+string_assign_literal(String dest, char *s) {
+	int len = strlen(s);
 
+	if(len > string_capacity(dest)) {
+		free(dest->data);
+		dest->capacity = len + 32;
+		dest->data = malloc(sizeof(char) * dest->capacity);
+	}
 
+	for(int i = 0; i < len; i++) {
+		dest->data[i] = s[i];
+	}
+}
+
+int 
+string_size(String s) {
+	return s->size;
+}
+
+int
+string_length(String s) {
+	return s->size;
+}
+
+int
+string_capacity(String s) {
+	return s->capacity;
+}
