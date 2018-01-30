@@ -1,8 +1,5 @@
 #include <string.h>
-
-struct string;
-
-typedef struct string *String;
+#include "cppstring.h"
 
 struct string {
 	int size;
@@ -24,7 +21,7 @@ string_ctor_empty(void) {
 }
 
 String
-string_ctor_copy(String *str) {
+string_ctor_copy(String str) {
 
 	String ret = malloc(sizeof(struct string));
 
@@ -154,6 +151,14 @@ string_assign_char(String dest, char c) {
 	dest->data[0] = c;
 }
 
+char
+string_at(String s, int pos) {
+	if(pos < s->size) {
+		return s->data[pos];
+	} else {
+		return '\0';
+	}
+}
 
 int 
 string_size(String s) {
@@ -168,4 +173,21 @@ string_length(String s) {
 int
 string_capacity(String s) {
 	return s->capacity;
+}
+
+int
+string_cmp_str(String s1, String s2) {
+	return strcmp(s1->data, s2->data);
+}
+
+bool
+string_eq(String s1, String s2) {
+	int result = 0;
+	result = string_cmp_str(s1, s2);
+
+	if(result == 0) {
+		return true;
+	} else {
+		return false;
+	}
 }
